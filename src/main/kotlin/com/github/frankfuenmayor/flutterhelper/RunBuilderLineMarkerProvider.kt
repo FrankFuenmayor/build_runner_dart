@@ -1,5 +1,6 @@
 package com.github.frankfuenmayor.flutterhelper
 
+import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.execution.configurations.GeneralCommandLine
@@ -25,12 +26,12 @@ import com.jetbrains.lang.dart.DartFileType
 import com.jetbrains.lang.dart.DartTokenTypes.AT
 import com.jetbrains.lang.dart.sdk.DartSdkUtil
 import com.jetbrains.lang.dart.util.PubspecYamlUtil
-import io.flutter.dart.DartPlugin
-import io.flutter.sdk.FlutterSdk
+import java.awt.event.MouseEvent
 import java.io.File
 
 class RunBuilderLineMarkerProvider(
-    private val knownAnnotations: List<String>? = null
+    private val knownAnnotations: List<String>? = null,
+    private val navigationHandler: GutterIconNavigationHandler<PsiElement> = X()
 ) : LineMarkerProvider {
     override fun getLineMarkerInfo(psiElement: PsiElement): LineMarkerInfo<*>? {
 
@@ -58,56 +59,54 @@ class RunBuilderLineMarkerProvider(
             psiElement,
             psiElement.textRange,
             Run.Run,
-            { "dart pub run build_runner build" }, { _, _ ->
-
-                val toolWindow =
-                    ToolWindowManager.getInstance(psiElement.project).getToolWindow("DartBuildRunnerOutput")
-
-                toolWindow?.show()
-
-
-                val dartSdkPath =
-                    DartPlugin.getDartSdk(psiElement.project)?.homePath
-                        ?: FlutterSdk.getFlutterSdk(psiElement.project)?.dartSdkPath
-                        ?: return@LineMarkerInfo
-
-                val dartExePath = DartSdkUtil.getDartExePath(dartSdkPath)
-
-                val yamlFile =
-                    PubspecYamlUtil.findPubspecYamlFile(
-                        psiElement.project,
-                        psiElement.containingFile.virtualFile
-                    )
-                        ?: return@LineMarkerInfo
-                val generalCommandLine = GeneralCommandLine(dartExePath, "run", "build_runner", "build")
-
-                generalCommandLine.charset = Charsets.UTF_8
-                generalCommandLine.workDirectory = File(yamlFile.parent.path)
-
-                val processHandler =
-                    ProcessHandlerFactory.getInstance().createColoredProcessHandler(generalCommandLine)
-
-                val consoleView = ShellScriptToolWindowManager.getConsoleView(psiElement.project)
-
-                processHandler.addProcessListener(object : ProcessAdapter() {
-                    override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
-                        val text = event.text
-                        val contentType = when (outputType) {
-                            ProcessOutputTypes.STDOUT -> ConsoleViewContentType.NORMAL_OUTPUT
-                            ProcessOutputTypes.STDERR -> ConsoleViewContentType.ERROR_OUTPUT
-                            else -> ConsoleViewContentType.SYSTEM_OUTPUT
-                        }
-                        consoleView?.print(text, contentType)
-                    }
-                })
-
-                processHandler.startNotify()
-
-            }, GutterIconRenderer.Alignment.LEFT, { "" }
+            { "dart pub run build_runner build" },
+            navigationHandler,
+            GutterIconRenderer.Alignment.LEFT, { "" }
         )
     }
+}
 
+class X : GutterIconNavigationHandler<PsiElement> {
+    override fun navigate(e: MouseEvent?, psiElement: PsiElement) {
+        val toolWindow =
+            ToolWindowManager.getInstance(psiElement.project).getToolWindow("DartBuildRunnerOutput")
 
+        toolWindow?.show()
+
+        val dartSdkPath = psiElement.project.dartSdk ?: return
+        val dartExePath = DartSdkUtil.getDartExePath(dartSdkPath)
+
+        val yamlFile =
+            PubspecYamlUtil.findPubspecYamlFile(
+                psiElement.project,
+                psiElement.containingFile.virtualFile
+            )
+                ?: return
+        val generalCommandLine = GeneralCommandLine(dartExePath, "run", "build_runner", "build")
+
+        generalCommandLine.charset = Charsets.UTF_8
+        generalCommandLine.workDirectory = File(yamlFile.parent.path)
+
+        val processHandler =
+            ProcessHandlerFactory.getInstance().createColoredProcessHandler(generalCommandLine)
+
+        val consoleView = ShellScriptToolWindowManager.getConsoleView(psiElement.project)
+
+        processHandler.addProcessListener(object : ProcessAdapter() {
+            override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
+                val text = event.text
+                val contentType = when (outputType) {
+                    ProcessOutputTypes.STDOUT -> ConsoleViewContentType.NORMAL_OUTPUT
+                    ProcessOutputTypes.STDERR -> ConsoleViewContentType.ERROR_OUTPUT
+                    else -> ConsoleViewContentType.SYSTEM_OUTPUT
+                }
+                consoleView?.print(text, contentType)
+            }
+        })
+
+        processHandler.startNotify()
+
+    }
 }
 
 class ShellScriptToolWindowFactory : ToolWindowFactory, DumbAware {

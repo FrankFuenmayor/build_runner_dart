@@ -1,16 +1,11 @@
 package com.github.frankfuenmayor.flutterhelper
 
+import com.intellij.codeInsight.daemon.LineMarkerInfo
+import com.intellij.psi.PsiElement
 import com.intellij.testFramework.TestDataPath
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
-import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
-import com.intellij.openapi.wm.IdeFrame
-import com.intellij.psi.PsiElement
-import com.intellij.ui.components.Label
 import com.jetbrains.lang.dart.DartFileType
-import com.jetbrains.lang.dart.psi.DartMetadata
 import io.mockk.mockk
-import java.awt.event.MouseEvent
-import javax.swing.JComponent
 
 @TestDataPath("\$CONTENT_ROOT/src/test/testData")
 class MyPluginTest : BasePlatformTestCase() {
@@ -52,6 +47,24 @@ void someFunction() {}
         val lineMarker = RunBuilderLineMarkerProvider().getLineMarkerInfo(element)
 
         assertNotNull("Line marker for annotation ${element.nextSibling.text} should not be null", lineMarker)
+    }
+
+    fun `test 2`() {
+
+        val psiFile = myFixture.configureByText(
+            DartFileType.INSTANCE, """                
+@freezed //line marker here
+void someFunction() {}
+""".trimMargin()
+        )
+        val element = psiFile.findElementAt(psiFile.text.indexOf("@freezed"))!!
+
+        @Suppress("UNCHECKED_CAST")
+        val lineMarker: LineMarkerInfo<PsiElement> =
+            RunBuilderLineMarkerProvider().getLineMarkerInfo(element) as LineMarkerInfo<PsiElement>
+
+        lineMarker.navigationHandler.navigate(mockk(), element)
+
     }
 }
 
