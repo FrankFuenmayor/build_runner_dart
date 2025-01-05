@@ -22,6 +22,7 @@
                 instance="com.github.frankfuenmayor.flutterhelper.PluginSettingsConfigurable"/>
 
         <toolWindow id="DartBuildRunnerOutput"
+                    anchor="bottom"
                     factoryClass="com.github.frankfuenmayor.flutterhelper.ShellScriptToolWindowFactory"/>
 
 
