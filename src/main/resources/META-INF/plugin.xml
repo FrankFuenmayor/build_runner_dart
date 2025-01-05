@@ -5,14 +5,30 @@
     <vendor>frankfuenmayor</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>Dart</depends>
+    <depends>io.flutter</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.frankfuenmayor.flutterhelper.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <toolWindow factoryClass="com.github.frankfuenmayor.flutterhelper.toolWindow.MyToolWindowFactory"
+                    id="MyToolWindow"/>
+        <codeInsight.lineMarkerProvider
+                implementationClass="com.github.frankfuenmayor.flutterhelper.RunBuilderLineMarkerProvider"
+                language="Dart"/>
+
+        <applicationConfigurable
+                displayName="Flutter Helper"
+                instance="com.github.frankfuenmayor.flutterhelper.PluginSettingsConfigurable"/>
+
+        <toolWindow id="DartBuildRunnerOutput"
+                    factoryClass="com.github.frankfuenmayor.flutterhelper.ShellScriptToolWindowFactory"/>
+
+
     </extensions>
 
     <applicationListeners>
-        <listener class="com.github.frankfuenmayor.flutterhelper.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
+        <listener class="com.github.frankfuenmayor.flutterhelper.listeners.MyApplicationActivationListener"
+                  topic="com.intellij.openapi.application.ApplicationActivationListener"/>
     </applicationListeners>
 </idea-plugin>

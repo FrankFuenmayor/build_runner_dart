@@ -8,9 +8,11 @@ intelliJPlatform = "2.1.0"
 kotlin = "1.9.25"
 kover = "0.8.3"
 qodana = "2024.2.3"
+mockk = "1.13.14"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk"}
 
 [plugins]
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
