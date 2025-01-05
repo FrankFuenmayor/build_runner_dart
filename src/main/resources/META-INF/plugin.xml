@@ -14,7 +14,7 @@
         <toolWindow factoryClass="com.github.frankfuenmayor.flutterhelper.toolWindow.MyToolWindowFactory"
                     id="MyToolWindow"/>
         <codeInsight.lineMarkerProvider
-                implementationClass="com.github.frankfuenmayor.flutterhelper.RunBuilderLineMarkerProvider"
+                implementationClass="com.github.frankfuenmayor.flutterhelper.RunBuilderRunnerLineMarkerProvider"
                 language="Dart"/>
 
         <applicationConfigurable
@@ -24,8 +24,6 @@
         <toolWindow id="DartBuildRunnerOutput"
                     anchor="bottom"
                     factoryClass="com.github.frankfuenmayor.flutterhelper.ShellScriptToolWindowFactory"/>
-
-
     </extensions>
 
     <applicationListeners>

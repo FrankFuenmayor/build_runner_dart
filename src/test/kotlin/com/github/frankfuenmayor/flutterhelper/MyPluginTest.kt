@@ -1,11 +1,13 @@
 package com.github.frankfuenmayor.flutterhelper
 
+import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.psi.PsiElement
 import com.intellij.testFramework.TestDataPath
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.jetbrains.lang.dart.DartFileType
 import io.mockk.mockk
+import io.mockk.verify
 
 @TestDataPath("\$CONTENT_ROOT/src/test/testData")
 class MyPluginTest : BasePlatformTestCase() {
@@ -44,27 +46,39 @@ void someFunction() {}
 """.trimMargin()
         )
         val element = psiFile.findElementAt(psiFile.text.indexOf("@freezed"))!!
-        val lineMarker = RunBuilderLineMarkerProvider().getLineMarkerInfo(element)
+        val lineMarker =
+            RunBuilderRunnerLineMarkerProvider().getLineMarkerInfo(element)
 
-        assertNotNull("Line marker for annotation ${element.nextSibling.text} should not be null", lineMarker)
+        assertNotNull(
+            "Line marker for annotation ${element.nextSibling.text} should not be null",
+            lineMarker
+        )
     }
 
     fun `test 2`() {
 
+
         val psiFile = myFixture.configureByText(
-            DartFileType.INSTANCE, """                
+            DartFileType.INSTANCE,
+            //language=dart
+            """                
 @freezed //line marker here
 void someFunction() {}
 """.trimMargin()
         )
+
         val element = psiFile.findElementAt(psiFile.text.indexOf("@freezed"))!!
+        val navigationHandler = mockk<GutterIconNavigationHandler<PsiElement>>()
 
         @Suppress("UNCHECKED_CAST")
         val lineMarker: LineMarkerInfo<PsiElement> =
-            RunBuilderLineMarkerProvider().getLineMarkerInfo(element) as LineMarkerInfo<PsiElement>
+            RunBuilderRunnerLineMarkerProvider(
+                navigationHandler = navigationHandler
+            ).getLineMarkerInfo(element) as LineMarkerInfo<PsiElement>
 
         lineMarker.navigationHandler.navigate(mockk(), element)
 
+        verify { navigationHandler.navigate(any(), element) }
     }
 }
 
