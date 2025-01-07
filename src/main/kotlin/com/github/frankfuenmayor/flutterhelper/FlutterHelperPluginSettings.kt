@@ -6,21 +6,37 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import javax.swing.*
+import javax.swing.table.AbstractTableModel
 import javax.swing.table.DefaultTableModel
 
-data class FlutterHelperPluginSettings(
-    var buildRunnerKnownAnnotations: List<String> = listOf("freezed")
+data class KnownAnnotation(val name: String, var filePatterns: List<String>)
+
+private val freezedAnnotation = KnownAnnotation("@freezed", listOf(".freezed.dart"))
+private val jsonAnnotation = KnownAnnotation("@json", listOf(".g.dart"))
+
+val builtInAnnotations = listOf(
+    freezedAnnotation,
+    jsonAnnotation,
 )
 
-val Project.flutterHelperPluginSettings
-    get(): FlutterHelperPluginSettings {
-        return FlutterHelperPluginSettingsService.getInstance(this).state
-    }
+data class FlutterHelperPluginSettings(private var annotations: List<KnownAnnotation> = emptyList()) {
+    val buildRunnerKnownAnnotations: List<KnownAnnotation>
+        get() = builtInAnnotations + annotations
+}
 
-@State(name = "FlutterHelperPluginSettings", storages = [Storage("FlutterHelperPluginSettings.xml")])
+val Project.flutterHelperPluginSettings
+    get(): FlutterHelperPluginSettings =
+        FlutterHelperPluginSettingsService.getInstance(this).state
+
+@State(
+    name = "FlutterHelperPluginSettings",
+    storages = [Storage("FlutterHelperPluginSettings.xml")]
+)
 @Service(Service.Level.PROJECT)
-class FlutterHelperPluginSettingsService : PersistentStateComponent<FlutterHelperPluginSettings> {
+class FlutterHelperPluginSettingsService :
+    PersistentStateComponent<FlutterHelperPluginSettings> {
     private var settings = FlutterHelperPluginSettings()
 
     override fun getState(): FlutterHelperPluginSettings = settings
@@ -37,27 +53,18 @@ class FlutterHelperPluginSettingsService : PersistentStateComponent<FlutterHelpe
 
 
 class PluginSettingsConfigurable : Configurable {
-    private var panel: JPanel? = null
+    private val settings =
+        FlutterHelperPluginSettingsService.getInstance(ProjectManager.getInstance().defaultProject).state
 
     override fun createComponent(): JComponent = JPanel().apply {
 
         add(JLabel("Dart build_runner annotations"))
-
-        val model = DefaultTableModel(0, 10)
-        model.setColumnIdentifiers(arrayOf("Annotation", "Description"))
-        model.addRow(arrayOf("@freezed", "Generate freezed classes"))
-        model.addRow(arrayOf("", ""))
-
+        val model = AnnotationsTableModel(settings);
         add(JScrollPane(JTable(model)))
-
-
-
     }
 
     override fun isModified(): Boolean {
-        val settings =
-            FlutterHelperPluginSettingsService.getInstance(com.intellij.openapi.project.ProjectManager.getInstance().defaultProject).state
-        return false;
+        return true
     }
 
     override fun apply() {
@@ -73,5 +80,39 @@ class PluginSettingsConfigurable : Configurable {
     }
 
     override fun getDisplayName(): String = "Flutter Helper"
+}
+
+class AnnotationsTableModel(private val settings: FlutterHelperPluginSettings) :
+    AbstractTableModel() {
+    override fun getRowCount(): Int = settings.buildRunnerKnownAnnotations.size + 1
+
+    override fun getColumnCount(): Int = 2
+
+    override fun getValueAt(rowIndex: Int, columnIndex: Int): Any {
+
+        if (rowIndex >= builtInAnnotations.size) {
+            return ""
+        }
+
+        val annotation = settings.buildRunnerKnownAnnotations[rowIndex]
+
+        return when (columnIndex) {
+            0 -> annotation.name
+            1 -> annotation.filePatterns.joinToString(", ")
+            else -> ""
+        }
+    }
+
+    override fun isCellEditable(rowIndex: Int, columnIndex: Int): Boolean {
+        return rowIndex >= builtInAnnotations.size
+    }
+
+    override fun getColumnName(column: Int): String {
+        return when (column) {
+            0 -> "Annotation"
+            1 -> "File Patterns"
+            else -> ""
+        }
+    }
 }
 
