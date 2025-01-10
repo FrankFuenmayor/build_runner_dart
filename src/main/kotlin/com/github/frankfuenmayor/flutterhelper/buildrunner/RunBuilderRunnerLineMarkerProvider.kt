@@ -1,5 +1,6 @@
-package com.github.frankfuenmayor.flutterhelper
+package com.github.frankfuenmayor.flutterhelper.buildrunner
 
+import com.github.frankfuenmayor.flutterhelper.settings.flutterHelperPluginSettings
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
@@ -18,7 +19,7 @@ import com.jetbrains.lang.dart.DartFileType
 import com.jetbrains.lang.dart.DartTokenTypes.AT
 
 class RunBuilderRunnerLineMarkerProvider(
-    private val knownAnnotations: List<String>? = null,
+    private val knownAnnotations: List<BuildRunnerKnownAnnotation>? = null,
     private val navigationHandler: GutterIconNavigationHandler<PsiElement> = RunBuilderRunnerNavigationHandler()
 ) : LineMarkerProvider {
     override fun getLineMarkerInfo(psiElement: PsiElement): LineMarkerInfo<*>? {
@@ -38,7 +39,10 @@ class RunBuilderRunnerLineMarkerProvider(
 
         val unknownAnnotation =
             (knownAnnotations
-                ?: psiElement.project.flutterHelperPluginSettings.buildRunnerKnownAnnotations).none { it == annotationIdentifier }
+                ?: psiElement.project.flutterHelperPluginSettings.buildRunnerKnownAnnotations)
+                .none { knownAnnotation ->
+                    knownAnnotation.identifier.removePrefix("@") == annotationIdentifier.removePrefix("@")
+                }
 
         if (unknownAnnotation) {
             return null
@@ -50,20 +54,18 @@ class RunBuilderRunnerLineMarkerProvider(
             Run.Run,
             { "dart pub run build_runner build" },
             navigationHandler,
-            GutterIconRenderer.Alignment.LEFT, { "" }
+            GutterIconRenderer.Alignment.LEFT,
+            { "" }
         )
     }
 }
 
-class ShellScriptToolWindowFactory : ToolWindowFactory, DumbAware {
+class DartBuildRunnerOutputWindow : ToolWindowFactory, DumbAware {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val consoleView = ConsoleViewImpl(project, true)
         val contentFactory = ContentFactory.getInstance()
         val content = contentFactory.createContent(consoleView.component, "", false)
         toolWindow.contentManager.addContent(content)
-
-        // Example: Add initial text to the console
-//        consoleView.print("Shell Script Output:\n", ConsoleViewContentType.NORMAL_OUTPUT)
 
         ShellScriptToolWindowManager.register(project, consoleView)
     }

@@ -1,5 +1,6 @@
-package com.github.frankfuenmayor.flutterhelper
+package com.github.frankfuenmayor.flutterhelper.buildrunner
 
+import com.github.frankfuenmayor.flutterhelper.dartSdk
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.ProcessAdapter
@@ -20,6 +21,8 @@ class RunBuilderRunnerNavigationHandler : GutterIconNavigationHandler<PsiElement
         val toolWindow =
             ToolWindowManager.getInstance(psiElement.project)
                 .getToolWindow("DartBuildRunnerOutput")
+
+        toolWindow?.title = "Dart Build Runner Output"
 
         toolWindow?.show()
 

@@ -14,16 +14,17 @@
         <toolWindow factoryClass="com.github.frankfuenmayor.flutterhelper.toolWindow.MyToolWindowFactory"
                     id="MyToolWindow"/>
         <codeInsight.lineMarkerProvider
-                implementationClass="com.github.frankfuenmayor.flutterhelper.RunBuilderRunnerLineMarkerProvider"
+                implementationClass="com.github.frankfuenmayor.flutterhelper.buildrunner.RunBuilderRunnerLineMarkerProvider"
                 language="Dart"/>
 
         <applicationConfigurable
                 displayName="Flutter Helper"
-                instance="com.github.frankfuenmayor.flutterhelper.PluginSettingsConfigurable"/>
+                instance="com.github.frankfuenmayor.flutterhelper.settings.FlutterHelperPluginSettingsPanel"/>
 
         <toolWindow id="DartBuildRunnerOutput"
+
                     anchor="bottom"
-                    factoryClass="com.github.frankfuenmayor.flutterhelper.ShellScriptToolWindowFactory"/>
+                    factoryClass="com.github.frankfuenmayor.flutterhelper.buildrunner.DartBuildRunnerOutputWindow"/>
     </extensions>
 
     <applicationListeners>
