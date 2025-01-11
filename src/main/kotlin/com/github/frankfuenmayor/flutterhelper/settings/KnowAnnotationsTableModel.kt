@@ -1,6 +1,6 @@
 package com.github.frankfuenmayor.flutterhelper.settings
 
-import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerKnownAnnotation.Companion.builtInAnnotations
+import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerKnownAnnotation.Companion.builtIns
 import javax.swing.table.AbstractTableModel
 
 class KnowAnnotationsTableModel(private val settings: FlutterHelperPluginSettings) : AbstractTableModel() {
@@ -10,7 +10,7 @@ class KnowAnnotationsTableModel(private val settings: FlutterHelperPluginSetting
 
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any {
 
-        if (rowIndex >= builtInAnnotations.size) {
+        if (rowIndex >= builtIns.size) {
             return ""
         }
 
@@ -23,7 +23,7 @@ class KnowAnnotationsTableModel(private val settings: FlutterHelperPluginSetting
         }
     }
 
-    override fun isCellEditable(rowIndex: Int, columnIndex: Int): Boolean = rowIndex >= builtInAnnotations.size
+    override fun isCellEditable(rowIndex: Int, columnIndex: Int): Boolean = rowIndex >= builtIns.size
 
     override fun getColumnName(column: Int): String {
         return when (column) {

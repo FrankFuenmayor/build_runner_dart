@@ -22,9 +22,13 @@
                 instance="com.github.frankfuenmayor.flutterhelper.settings.FlutterHelperPluginSettingsPanel"/>
 
         <toolWindow id="DartBuildRunnerOutput"
-
                     anchor="bottom"
                     factoryClass="com.github.frankfuenmayor.flutterhelper.buildrunner.DartBuildRunnerOutputWindow"/>
+
+        <notificationGroup id="Flutter Helper Notification Group"
+                           displayType="BALLOON"
+                           key="randomLabel"
+                           />
     </extensions>
 
     <applicationListeners>
