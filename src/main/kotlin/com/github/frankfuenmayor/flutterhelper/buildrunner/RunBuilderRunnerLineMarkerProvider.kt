@@ -27,12 +27,12 @@ class RunBuilderRunnerLineMarkerProvider(
 
         val annotationIdentifier = psiElement.nextSibling.text
 
-        val unknownAnnotation =
-            psiElement.project.flutterHelperPluginSettings.buildRunnerKnownAnnotations.none { knownAnnotation ->
-                knownAnnotation.identifier.removePrefix("@") == annotationIdentifier.removePrefix("@")
+        val annotation =
+            psiElement.project.flutterHelperPluginSettings.buildRunnerKnownAnnotations.find { knownAnnotation ->
+                knownAnnotation.identifier == annotationIdentifier
             }
 
-        if (unknownAnnotation) {
+        if (annotation == null) {
             return null
         }
 
