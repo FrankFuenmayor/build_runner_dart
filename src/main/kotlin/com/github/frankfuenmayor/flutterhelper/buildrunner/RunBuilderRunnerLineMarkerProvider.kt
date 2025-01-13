@@ -1,6 +1,6 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner
 
-import com.github.frankfuenmayor.flutterhelper.settings.flutterHelperPluginSettings
+import com.github.frankfuenmayor.flutterhelper.settings.settings
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
@@ -28,7 +28,7 @@ class RunBuilderRunnerLineMarkerProvider(
         val annotationIdentifier = psiElement.nextSibling.text
 
         val annotation =
-            psiElement.project.flutterHelperPluginSettings.buildRunnerKnownAnnotations.find { knownAnnotation ->
+            psiElement.project.settings.buildRunnerAnnotations.find { knownAnnotation ->
                 knownAnnotation.identifier == annotationIdentifier
             }
 

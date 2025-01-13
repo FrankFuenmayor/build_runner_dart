@@ -11,18 +11,18 @@ import com.intellij.openapi.project.Project
     storages = [Storage("FlutterHelperPluginSettings.xml")]
 )
 @Service(Service.Level.PROJECT)
-class FlutterHelperPluginSettingsService :
-    PersistentStateComponent<FlutterHelperPluginSettings> {
-    private var settings = FlutterHelperPluginSettings()
+class SettingsService :
+    PersistentStateComponent<Settings> {
+    private var settings = Settings()
 
-    override fun getState(): FlutterHelperPluginSettings = settings
+    override fun getState(): Settings = settings
 
-    override fun loadState(state: FlutterHelperPluginSettings) {
+    override fun loadState(state: Settings) {
         settings = state
     }
 
     companion object {
-        fun getInstance(project: Project): FlutterHelperPluginSettingsService =
-            project.getService(FlutterHelperPluginSettingsService::class.java)
+        fun getInstance(project: Project): SettingsService =
+            project.getService(SettingsService::class.java)
     }
 }

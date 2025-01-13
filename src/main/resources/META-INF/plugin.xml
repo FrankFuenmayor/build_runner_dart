@@ -17,15 +17,14 @@
 
         <applicationConfigurable
                 displayName="Flutter Helper"
-                instance="com.github.frankfuenmayor.flutterhelper.settings.FlutterHelperPluginSettingsPanel"/>
+                instance="com.github.frankfuenmayor.flutterhelper.settings.SettingsPanel"/>
 
-        <toolWindow id="DartBuildRunnerOutput"
+        <toolWindow id="Build Runner"
                     anchor="bottom"
                     factoryClass="com.github.frankfuenmayor.flutterhelper.buildrunner.DartBuildRunnerOutputWindow"/>
 
         <notificationGroup id="Flutter Helper Notification Group"
                            displayType="BALLOON"
-                           key="randomLabel"
         />
     </extensions>
 </idea-plugin>

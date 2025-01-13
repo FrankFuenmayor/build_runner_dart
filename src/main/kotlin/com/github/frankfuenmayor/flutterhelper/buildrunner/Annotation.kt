@@ -1,7 +1,7 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner
 
 
-class BuildRunnerKnownAnnotation(identifier: String, var filePatterns: List<String>) {
+class Annotation(identifier: String, var filePatterns: List<String>) {
 
     val identifier = identifier.removePrefix("@")
 
@@ -17,7 +17,7 @@ class BuildRunnerKnownAnnotation(identifier: String, var filePatterns: List<Stri
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
-        other as BuildRunnerKnownAnnotation
+        other as Annotation
         return identifier == other.identifier
     }
 
@@ -26,15 +26,15 @@ class BuildRunnerKnownAnnotation(identifier: String, var filePatterns: List<Stri
     }
 }
 
-private val freezedAnnotation = BuildRunnerKnownAnnotation(
+private val freezedAnnotation = Annotation(
     identifier = "freezed",
     filePatterns = listOf(".freezed.dart", "g.dart"),
 )
-private val unfreezedAnnotation = BuildRunnerKnownAnnotation(
+private val unfreezedAnnotation = Annotation(
     identifier = "unfreezed",
     filePatterns = listOf(".freezed.dart", "g.dart"),
 )
-private val jsonAnnotation = BuildRunnerKnownAnnotation(
+private val jsonAnnotation = Annotation(
     identifier = "JsonSerializable",
     filePatterns = listOf(".g.dart")
 )

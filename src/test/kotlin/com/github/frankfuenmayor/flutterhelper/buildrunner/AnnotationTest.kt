@@ -3,16 +3,16 @@ package com.github.frankfuenmayor.flutterhelper.buildrunner
 import org.junit.Test
 
 
-class BuildRunnerKnownAnnotationTest {
+class AnnotationTest {
 
     @Test
     fun testEquals() {
-        val annotation = BuildRunnerKnownAnnotation(
+        val annotation = Annotation(
             identifier = "freezed",
             filePatterns = listOf(".dart"),
         )
 
-        val annotation2 = BuildRunnerKnownAnnotation(
+        val annotation2 = Annotation(
             "@freezed",
             filePatterns = listOf(".dart"),
         )

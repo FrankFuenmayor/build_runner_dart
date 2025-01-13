@@ -6,16 +6,16 @@ import java.awt.BorderLayout
 import javax.swing.*
 
 
-class FlutterHelperPluginSettingsPanel : Configurable {
+class SettingsPanel : Configurable {
     private val settings =
-        FlutterHelperPluginSettingsService.getInstance(ProjectManager.getInstance().defaultProject).state
+        SettingsService.getInstance(ProjectManager.getInstance().defaultProject).state
 
     override fun createComponent(): JComponent = JPanel().apply {
 
         layout = BorderLayout()
 
         add(JLabel("Dart build_runner annotations"), BorderLayout.NORTH)
-        val model = KnowAnnotationsTableModel(settings);
+        val model = AnnotationsTableModel(settings);
         val table = JTable(model)
         add(JScrollPane(table), BorderLayout.CENTER)
     }
