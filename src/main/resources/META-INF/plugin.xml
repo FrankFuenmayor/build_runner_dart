@@ -11,8 +11,6 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.frankfuenmayor.flutterhelper.toolWindow.MyToolWindowFactory"
-                    id="MyToolWindow"/>
         <codeInsight.lineMarkerProvider
                 implementationClass="com.github.frankfuenmayor.flutterhelper.buildrunner.RunBuilderRunnerLineMarkerProvider"
                 language="Dart"/>
@@ -28,11 +26,6 @@
         <notificationGroup id="Flutter Helper Notification Group"
                            displayType="BALLOON"
                            key="randomLabel"
-                           />
+        />
     </extensions>
-
-    <applicationListeners>
-        <listener class="com.github.frankfuenmayor.flutterhelper.listeners.MyApplicationActivationListener"
-                  topic="com.intellij.openapi.application.ApplicationActivationListener"/>
-    </applicationListeners>
 </idea-plugin>
