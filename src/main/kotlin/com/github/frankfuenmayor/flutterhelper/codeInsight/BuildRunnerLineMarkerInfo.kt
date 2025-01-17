@@ -15,7 +15,7 @@ class BuildRunnerLineMarkerInfo(
     psiElement,
     psiElement.textRange,
     ExpUiIcons.Run.Run,
-    { "dart pub run build_runner build" },
+    { "Run build_runner build" },
     navigationHandler,
     GutterIconRenderer.Alignment.LEFT,
     { "" }
