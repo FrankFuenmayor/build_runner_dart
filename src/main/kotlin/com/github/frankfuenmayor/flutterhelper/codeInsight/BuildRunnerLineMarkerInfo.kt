@@ -1,6 +1,6 @@
-package com.github.frankfuenmayor.flutterhelper.buildrunner
+package com.github.frankfuenmayor.flutterhelper.codeInsight
 
-import com.github.frankfuenmayor.flutterhelper.buildrunner.RunBuilderRunnerNavigationHandler.Companion.isRunning
+import com.github.frankfuenmayor.flutterhelper.codeInsight.RunBuilderRunnerNavigationHandler.Companion.isRunning
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.icons.ExpUiIcons
@@ -24,7 +24,7 @@ class BuildRunnerLineMarkerInfo(
     override fun createGutterRenderer(): GutterIconRenderer {
         return object : LineMarkerGutterIconRenderer<PsiElement>(this) {
             override fun getIcon(): Icon {
-                return if(this.lineMarkerInfo.element?.isRunning == true) ExpUiIcons.Run.Stop else ExpUiIcons.Run.Run
+                return if (this.lineMarkerInfo.element?.isRunning == true) ExpUiIcons.Run.Stop else ExpUiIcons.Run.Run
             }
         }
     }

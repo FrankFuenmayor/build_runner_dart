@@ -1,4 +1,4 @@
-package com.github.frankfuenmayor.flutterhelper.buildrunner
+package com.github.frankfuenmayor.flutterhelper.codeInsight
 
 import com.github.frankfuenmayor.flutterhelper.settings.settings
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
@@ -7,7 +7,7 @@ import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
 import com.jetbrains.lang.dart.DartFileType
-import com.jetbrains.lang.dart.DartTokenTypes.AT
+import com.jetbrains.lang.dart.DartTokenTypes
 
 class RunBuilderRunnerLineMarkerProvider(
     private val navigationHandler: GutterIconNavigationHandler<PsiElement> = RunBuilderRunnerNavigationHandler()
@@ -21,7 +21,7 @@ class RunBuilderRunnerLineMarkerProvider(
             return null
         }
 
-        if (psiElement.elementType != AT) {
+        if (psiElement.elementType != DartTokenTypes.AT) {
             return null
         }
 
@@ -40,3 +40,6 @@ class RunBuilderRunnerLineMarkerProvider(
     }
 }
 
+class KnownAnnotations {
+
+}

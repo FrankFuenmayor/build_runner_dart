@@ -12,7 +12,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <codeInsight.lineMarkerProvider
-                implementationClass="com.github.frankfuenmayor.flutterhelper.buildrunner.RunBuilderRunnerLineMarkerProvider"
+                implementationClass="com.github.frankfuenmayor.flutterhelper.codeInsight.RunBuilderRunnerLineMarkerProvider"
                 language="Dart"/>
 
         <applicationConfigurable
@@ -21,7 +21,7 @@
 
         <toolWindow id="Build Runner"
                     anchor="bottom"
-                    factoryClass="com.github.frankfuenmayor.flutterhelper.buildrunner.DartBuildRunnerOutputWindow"/>
+                    factoryClass="com.github.frankfuenmayor.flutterhelper.ui.DartBuildRunnerOutputWindow"/>
 
         <notificationGroup id="Flutter Helper Notification Group"
                            displayType="BALLOON"

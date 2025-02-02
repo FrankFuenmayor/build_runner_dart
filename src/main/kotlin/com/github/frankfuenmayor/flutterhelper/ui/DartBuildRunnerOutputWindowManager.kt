@@ -1,4 +1,4 @@
-package com.github.frankfuenmayor.flutterhelper.buildrunner
+package com.github.frankfuenmayor.flutterhelper.ui
 
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.project.Project
