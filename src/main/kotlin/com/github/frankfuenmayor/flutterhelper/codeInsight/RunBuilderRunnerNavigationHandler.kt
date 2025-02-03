@@ -1,19 +1,17 @@
 package com.github.frankfuenmayor.flutterhelper.codeInsight
 
+import com.github.frankfuenmayor.flutterhelper.buildrunner.Annotation
 import com.github.frankfuenmayor.flutterhelper.buildrunner.action.BuildRunnerBuild
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Key
-import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiElement
-import icons.DartIcons
 import java.awt.event.MouseEvent
-import javax.swing.JMenuItem
-import javax.swing.JPopupMenu
 
 class RunBuilderRunnerNavigationHandler(
-    private val buildRunnerBuild: BuildRunnerBuild = BuildRunnerBuild()
+    private val buildRunnerBuild: BuildRunnerBuild = BuildRunnerBuild(),
+    private val annotation: Annotation
 ) : GutterIconNavigationHandler<PsiElement> {
 
     companion object {
@@ -25,7 +23,6 @@ class RunBuilderRunnerNavigationHandler(
 
         fun PsiElement.setRunning(value: Boolean) = putUserData(isRunningKey, value)
     }
-
 
     override fun navigate(e: MouseEvent, psiElement: PsiElement) {
 

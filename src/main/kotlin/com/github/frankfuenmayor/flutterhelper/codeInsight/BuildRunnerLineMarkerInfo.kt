@@ -10,7 +10,7 @@ import javax.swing.Icon
 
 class BuildRunnerLineMarkerInfo(
     psiElement: PsiElement,
-    navigationHandler: GutterIconNavigationHandler<PsiElement> = RunBuilderRunnerNavigationHandler(),
+    navigationHandler: GutterIconNavigationHandler<PsiElement>,
 ) : LineMarkerInfo<PsiElement>(
     psiElement,
     psiElement.textRange,
@@ -21,11 +21,9 @@ class BuildRunnerLineMarkerInfo(
     { "" }
 ) {
 
-    override fun createGutterRenderer(): GutterIconRenderer {
-        return object : LineMarkerGutterIconRenderer<PsiElement>(this) {
-            override fun getIcon(): Icon {
-                return if (this.lineMarkerInfo.element?.isRunning == true) ExpUiIcons.Run.Stop else ExpUiIcons.Run.Run
-            }
+    override fun createGutterRenderer(): GutterIconRenderer = object : LineMarkerGutterIconRenderer<PsiElement>(this) {
+        override fun getIcon(): Icon {
+            return if (this.lineMarkerInfo.element?.isRunning == true) ExpUiIcons.Run.Stop else ExpUiIcons.Run.Run
         }
     }
 }

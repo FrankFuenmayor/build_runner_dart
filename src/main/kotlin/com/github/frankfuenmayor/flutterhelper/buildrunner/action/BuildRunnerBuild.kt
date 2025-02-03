@@ -5,6 +5,7 @@ import com.github.frankfuenmayor.flutterhelper.ui.DartBuildRunnerOutputWindowMan
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.*
 import com.intellij.execution.ui.ConsoleViewContentType
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
@@ -67,6 +68,8 @@ class BuildRunnerBuild(
 class BuildRunnerBuildCommandLineProvider {
 
     fun getCommandLine(project: Project, workDirectory: File): GeneralCommandLine? {
+
+        ApplicationManager.getApplication().
         val dartSdkPath = project.dartSdk ?: return null
         val dartExePath = DartSdkUtil.getDartExePath(dartSdkPath)
 
