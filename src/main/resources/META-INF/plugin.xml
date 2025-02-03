@@ -24,7 +24,6 @@
                     factoryClass="com.github.frankfuenmayor.flutterhelper.ui.DartBuildRunnerOutputWindow"/>
 
         <notificationGroup id="Flutter Helper Notification Group"
-                           displayType="BALLOON"
-        />
+                           displayType="BALLOON"/>
     </extensions>
 </idea-plugin>

@@ -1,6 +1,6 @@
 package com.github.frankfuenmayor.flutterhelper.codeInsight
 
-import com.github.frankfuenmayor.flutterhelper.settings.settings
+import com.github.frankfuenmayor.flutterhelper.settings.SettingsService
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
@@ -10,7 +10,8 @@ import com.jetbrains.lang.dart.DartFileType
 import com.jetbrains.lang.dart.DartTokenTypes
 
 class RunBuilderRunnerLineMarkerProvider(
-    private val navigationHandler: GutterIconNavigationHandler<PsiElement> = RunBuilderRunnerNavigationHandler()
+    private val navigationHandler: GutterIconNavigationHandler<PsiElement> = RunBuilderRunnerNavigationHandler(),
+    private val knownAnnotations: BuildRunnerBuildKnownAnnotations = BuildRunnerBuildKnownAnnotations()
 ) : LineMarkerProvider {
     override fun getLineMarkerInfo(psiElement: PsiElement): LineMarkerInfo<*>? {
 
@@ -27,19 +28,19 @@ class RunBuilderRunnerLineMarkerProvider(
 
         val annotationIdentifier = psiElement.nextSibling.text
 
-        val annotation =
-            psiElement.project.settings.buildRunnerAnnotations.find { knownAnnotation ->
-                knownAnnotation.identifier == annotationIdentifier
-            }
-
-        if (annotation == null) {
-            return null
-        }
+        val annotation = knownAnnotations.findAnnotation(annotationIdentifier) ?: return null
 
         return BuildRunnerLineMarkerInfo(psiElement, navigationHandler)
     }
 }
 
-class KnownAnnotations {
-
+class BuildRunnerBuildKnownAnnotations(
+    private val settingsService: SettingsService = SettingsService.getInstance()
+) {
+    fun findAnnotation(annotationIdentifier: String) = settingsService
+        .state
+        .buildRunnerAnnotations
+        .find { knownAnnotation ->
+            knownAnnotation.identifier == annotationIdentifier
+        }
 }

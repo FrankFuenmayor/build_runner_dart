@@ -8,7 +8,7 @@ import javax.swing.*
 
 class SettingsPanel : Configurable {
     private val settings =
-        SettingsService.getInstance(ProjectManager.getInstance().defaultProject).state
+        SettingsService.getInstance().state
 
     override fun createComponent(): JComponent = JPanel().apply {
 

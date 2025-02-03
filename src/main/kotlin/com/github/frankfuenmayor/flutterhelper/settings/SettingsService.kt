@@ -1,16 +1,16 @@
 package com.github.frankfuenmayor.flutterhelper.settings
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
-import com.intellij.openapi.project.Project
 
 @State(
     name = "FlutterHelperPluginSettings",
     storages = [Storage("FlutterHelperPluginSettings.xml")]
 )
-@Service(Service.Level.PROJECT)
+@Service(Service.Level.APP)
 class SettingsService :
     PersistentStateComponent<Settings> {
     private var settings = Settings()
@@ -22,7 +22,7 @@ class SettingsService :
     }
 
     companion object {
-        fun getInstance(project: Project): SettingsService =
-            project.getService(SettingsService::class.java)
+        fun getInstance(): SettingsService =
+            ApplicationManager.getApplication().getService(SettingsService::class.java)
     }
 }
