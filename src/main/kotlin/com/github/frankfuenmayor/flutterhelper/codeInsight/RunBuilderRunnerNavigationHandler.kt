@@ -81,14 +81,18 @@ private fun createPopupMenuForElement(
         )?.let { PubspecYamlUtil.getDartProjectName(it) }
 
         val header =
-            JMenuItem("<html><small>package: ${dartProjectName}</small></html>")
-        add(header.also { isEnabled = false }, DartIcons.Dart_16)
+            JMenuItem(
+                "<html><small>package: ${dartProjectName}</small></html>",
+                DartIcons.Dart_16
+            )
+
+        add(header.also { isEnabled = false })
 
         buildRunnerAnnotation.filePatterns.map {
             val outputFilename = it.replace("*", filenameWithoutExtension)
             val generatedFilename = folder + File.separator + outputFilename
 
-            val item = JMenuItem("Generate $outputFilename", DartIcons.Dart_16)
+            val item = JMenuItem("Generate $outputFilename")
 
             item.addActionListener {
                 buildRunnerBuild(
@@ -105,8 +109,7 @@ private fun createPopupMenuForElement(
         add(JSeparator())
 
         val generateAll = JMenuItem(
-            "Generate All (delete conflicting outputs)",
-            DartIcons.Dart_16
+            "Generate All (delete conflicting outputs)"
         ).apply {
             addActionListener {
                 buildRunnerBuild(
