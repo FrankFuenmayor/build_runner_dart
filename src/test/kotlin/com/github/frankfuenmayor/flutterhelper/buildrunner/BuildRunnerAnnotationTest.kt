@@ -3,20 +3,20 @@ package com.github.frankfuenmayor.flutterhelper.buildrunner
 import org.junit.Test
 
 
-class AnnotationTest {
+class BuildRunnerAnnotationTest {
 
     @Test
     fun testEquals() {
-        val annotation = Annotation(
+        val buildRunnerAnnotation = BuildRunnerAnnotation(
             identifier = "freezed",
             filePatterns = listOf(".dart"),
         )
 
-        val annotation2 = Annotation(
+        val buildRunnerAnnotation2 = BuildRunnerAnnotation(
             "@freezed",
             filePatterns = listOf(".dart"),
         )
 
-        assert(annotation == annotation2)
+        assert(buildRunnerAnnotation == buildRunnerAnnotation2)
     }
 }

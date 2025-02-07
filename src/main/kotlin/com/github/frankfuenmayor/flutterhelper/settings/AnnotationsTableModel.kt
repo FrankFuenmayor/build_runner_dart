@@ -1,12 +1,12 @@
 package com.github.frankfuenmayor.flutterhelper.settings
 
-import com.github.frankfuenmayor.flutterhelper.buildrunner.Annotation.Companion.builtIns
+import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerAnnotation.Companion.builtIns
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.PropertyKey
 import javax.swing.table.AbstractTableModel
 
 class AnnotationsTableModel(private val settings: Settings) : AbstractTableModel() {
-    override fun getRowCount(): Int = settings.buildRunnerAnnotations.size
+    override fun getRowCount(): Int = settings.buildRunnerBuildRunnerAnnotations.size
 
     override fun getColumnCount(): Int = 2
 
@@ -16,7 +16,7 @@ class AnnotationsTableModel(private val settings: Settings) : AbstractTableModel
             return ""
         }
 
-        val annotation = settings.buildRunnerAnnotations[rowIndex]
+        val annotation = settings.buildRunnerBuildRunnerAnnotations[rowIndex]
 
         return when (columnIndex) {
             0 -> annotation.identifier

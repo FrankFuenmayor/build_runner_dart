@@ -1,0 +1,7 @@
+class MyDummyClass {
+
+  void dummyMethod(){
+
+  }
+
+}

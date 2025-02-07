@@ -1,16 +1,13 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner.action
 
-import com.github.frankfuenmayor.flutterhelper.dartSdk
+import com.github.frankfuenmayor.flutterhelper.buildrunner.configurations.BuildRunnerBuildCommandLineProvider
 import com.github.frankfuenmayor.flutterhelper.ui.DartBuildRunnerOutputWindowManager
-import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.*
 import com.intellij.execution.ui.ConsoleViewContentType
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindowManager
-import com.jetbrains.lang.dart.sdk.DartSdkUtil
 import com.jetbrains.lang.dart.util.PubspecYamlUtil
 import java.io.File
 
@@ -21,14 +18,24 @@ class BuildRunnerBuild(
     private val findPubspecYamlFile: FindPubspecYamlFile = PubspecYamlUtil::findPubspecYamlFile
 ) {
     operator fun invoke(
-        project: Project, virtualFile: VirtualFile, onBuildEnd: () -> Unit
+        project: Project,
+        virtualFile: VirtualFile,
+        buildFilter: List<String> = emptyList(),
+        deleteConflictingOutputs: Boolean = false,
+        onBuildEnd: () -> Unit = {}
     ) {
 
         val yamlFile = findPubspecYamlFile(project, virtualFile) ?: return
 
+        val workDirectory = File(yamlFile.parent.path)
+
         val generalCommandLine =
-            commandLineProvider.getCommandLine(project, File(yamlFile.parent.path))
-                ?: return
+            commandLineProvider.getCommandLine(
+                project = project,
+                workDirectory = workDirectory,
+                outputFiles = buildFilter,
+                deleteConflictingOutputs = deleteConflictingOutputs
+            )
 
         val processHandler: BaseProcessHandler<Process> =
             ProcessHandlerFactory.getInstance()
@@ -39,7 +46,7 @@ class BuildRunnerBuild(
 
         val toolWindow =
             ToolWindowManager.getInstance(project)
-                .getToolWindow("DartBuildRunnerOutput")
+                .getToolWindow("Build Runner")
 
         toolWindow?.title = "Dart Build Runner Output"
 
@@ -65,22 +72,3 @@ class BuildRunnerBuild(
     }
 }
 
-class BuildRunnerBuildCommandLineProvider {
-
-    fun getCommandLine(project: Project, workDirectory: File): GeneralCommandLine? {
-
-        ApplicationManager.getApplication().
-        val dartSdkPath = project.dartSdk ?: return null
-        val dartExePath = DartSdkUtil.getDartExePath(dartSdkPath)
-
-        return GeneralCommandLine(
-            dartExePath,
-            "run",
-            "build_runner",
-            "build"
-        ).apply {
-            charset = Charsets.UTF_8
-            setWorkDirectory(workDirectory)
-        }
-    }
-}

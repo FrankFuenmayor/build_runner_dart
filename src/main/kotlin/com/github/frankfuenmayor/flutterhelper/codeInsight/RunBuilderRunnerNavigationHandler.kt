@@ -1,17 +1,26 @@
 package com.github.frankfuenmayor.flutterhelper.codeInsight
 
-import com.github.frankfuenmayor.flutterhelper.buildrunner.Annotation
 import com.github.frankfuenmayor.flutterhelper.buildrunner.action.BuildRunnerBuild
-import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
+import com.github.frankfuenmayor.flutterhelper.settings.BuildRunnerBuildKnownAnnotations
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.elementType
+import com.jetbrains.lang.dart.DartTokenTypes
+import com.jetbrains.lang.dart.util.PubspecYamlUtil
+import icons.DartIcons
 import java.awt.event.MouseEvent
+import java.io.File
+import javax.swing.JMenuItem
+import javax.swing.JPopupMenu
+import javax.swing.JSeparator
 
 class RunBuilderRunnerNavigationHandler(
-    private val buildRunnerBuild: BuildRunnerBuild = BuildRunnerBuild(),
-    private val annotation: Annotation
+    private val createPopupMenu: (PsiElement) -> JPopupMenu = { psiElement ->
+        createPopupMenuForElement(
+            psiElement
+        )
+    }
 ) : GutterIconNavigationHandler<PsiElement> {
 
     companion object {
@@ -25,6 +34,7 @@ class RunBuilderRunnerNavigationHandler(
     }
 
     override fun navigate(e: MouseEvent, psiElement: PsiElement) {
+        assert(psiElement.elementType == DartTokenTypes.AT)
 
 //        if (psiElement.isRunning) {
 //            NotificationGroupManager.getInstance()
@@ -40,40 +50,75 @@ class RunBuilderRunnerNavigationHandler(
 //
 //        psiElement.setRunning(true)
 
-//        createPopupMenu().show(e.component, e.x, e.y)
-
-
-        kotlin.runCatching {
-            buildRunnerBuild(
-                psiElement.project,
-                psiElement.containingFile.virtualFile,
-                onBuildEnd = {
-//                    psiElement.setRunning(false)
-                    ApplicationManager.getApplication().runReadAction {
-                        DaemonCodeAnalyzer.getInstance(psiElement.project)
-                            .restart(psiElement.containingFile)
-                    }
-                }
-            )
-        }
+        createPopupMenu(psiElement).show(e.component, e.x, e.y)
     }
+}
 
-//    private fun createPopupMenu(): JPopupMenu {
-//        val popupMenu = JPopupMenu()
-//        val menuItem1 = JMenuItem("Action 1")
-//        menuItem1.addActionListener {
-//             Handle "Action 1" here
-//            println("Action 1 selected")
-//        }
-//        popupMenu.add(menuItem1)
-//
-//        val menuItem2 = JMenuItem("Action 2", DartIcons.Dart_16)
-//        menuItem2.addActionListener {
-//             Handle "Action 2" here
-//            println("Action 2 selected")
-//        }
-//        popupMenu.add(menuItem2)
-//
-//        return popupMenu
-//    }
+
+private fun createPopupMenuForElement(
+    psiElement: PsiElement,
+    buildRunnerBuild: BuildRunnerBuild = BuildRunnerBuild(),
+    knownAnnotations: BuildRunnerBuildKnownAnnotations = BuildRunnerBuildKnownAnnotations()
+): JPopupMenu {
+
+    val annotationIdentifier = psiElement.nextSibling.text
+
+    val buildRunnerAnnotation =
+        knownAnnotations.findAnnotation(annotationIdentifier) ?: return JPopupMenu()
+
+    val folder = psiElement.containingFile.parent?.virtualFile?.path
+
+    val filenameWithoutExtension =
+        psiElement.containingFile.name.removeSuffix(".dart")
+
+    val elementVirtualFile = psiElement.containingFile.virtualFile
+
+    return JPopupMenu("build runner build").apply {
+
+        val dartProjectName = PubspecYamlUtil.findPubspecYamlFile(
+            psiElement.project,
+            elementVirtualFile
+        )?.let { PubspecYamlUtil.getDartProjectName(it) }
+
+        val header =
+            JMenuItem("<html><small>package: ${dartProjectName}</small></html>")
+        add(header.also { isEnabled = false }, DartIcons.Dart_16)
+
+        buildRunnerAnnotation.filePatterns.map {
+            val outputFilename = it.replace("*", filenameWithoutExtension)
+            val generatedFilename = folder + File.separator + outputFilename
+
+            val item = JMenuItem("Generate $outputFilename", DartIcons.Dart_16)
+
+            item.addActionListener {
+                buildRunnerBuild(
+                    project = psiElement.project,
+                    virtualFile = elementVirtualFile,
+                    buildFilter = listOf(generatedFilename),
+                    deleteConflictingOutputs = false
+                )
+            }
+
+            add(item)
+        }
+
+        add(JSeparator())
+
+        val generateAll = JMenuItem(
+            "Generate All (delete conflicting outputs)",
+            DartIcons.Dart_16
+        ).apply {
+            addActionListener {
+                buildRunnerBuild(
+                    project = psiElement.project,
+                    virtualFile = elementVirtualFile,
+                    deleteConflictingOutputs = true
+                )
+            }
+        }
+
+        add(
+            generateAll
+        )
+    }
 }

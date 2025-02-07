@@ -1,5 +1,6 @@
 package com.github.frankfuenmayor.flutterhelper.codeInsight
 
+import com.github.frankfuenmayor.flutterhelper.settings.BuildRunnerBuildKnownAnnotations
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.psi.PsiElement
@@ -15,16 +16,17 @@ class RunBuilderRunnerLineMarkerProviderTest : BasePlatformTestCase() {
 
     fun `test - add marker to known annotation`() {
 
-        val psiFile = givenFileWithContent(
+        val psiFile = dartFileWithContent(
             """                
-@freezed //line marker here
-void someFunction() {}
-""".trimMargin()
+            | @freezed
+            | void someFunction() {}
+            """.trimMargin()
         )
 
-        val annotationElement = psiFile.findElement(freezedAnnotation)
-        val lineMarkerProvider = givenRunBuilderRunnerLineMarkerProvider();
-        val expectedLineMarkerInfo = lineMarkerProvider.getLineMarkerInfo(annotationElement)
+        val annotationElement = psiFile.findElement(FREEZED_ANNOTATION)
+        val lineMarkerProvider = newRunBuilderRunnerLineMarkerProvider()
+        val expectedLineMarkerInfo =
+            lineMarkerProvider.getLineMarkerInfo(annotationElement)
 
         assertNotNull(
             "Line marker for annotation ${annotationElement.nextSibling.text} should not be null",
@@ -34,15 +36,15 @@ void someFunction() {}
 
     fun `test - do not add marker to unknown annotation`() {
 
-        val psiFile = givenFileWithContent(
-            """                
-@UnknownAnnotation
-void someFunction() {}
-""".trimMargin()
+        val psiFile = dartFileWithContent(
+            """
+            | @UnknownAnnotation
+            | void someFunction() {} 
+            """.trimMargin()
         )
 
         val annotationElement = psiFile.findElement("@UnknownAnnotation")
-        val lineMarkerProvider = givenRunBuilderRunnerLineMarkerProvider();
+        val lineMarkerProvider = newRunBuilderRunnerLineMarkerProvider()
         val expectedNull = lineMarkerProvider.getLineMarkerInfo(annotationElement)
 
         assertNull(
@@ -52,20 +54,20 @@ void someFunction() {}
     }
 
     fun `test - navigate successfully`() {
-        val code = """                
-@freezed //line marker here
-void someFunction() {}
-""".trimMargin()
+        val file = dartFileWithContent(
+            """                
+            | @freezed
+            | void someFunction() {}
+            """.trimMargin()
+        )
 
-        val file = givenFileWithContent(code)
-
-        val navigationHandler = givenGutterIconNavigationHandler()
+        val navigationHandler = newGutterIconNavigationHandler()
             .thatNavigatesSuccessfully()
 
         val lineMarkerProvider =
-            givenRunBuilderRunnerLineMarkerProvider(navigationHandler = navigationHandler)
+            newRunBuilderRunnerLineMarkerProvider(navigationHandler = navigationHandler)
 
-        val annotationElement = file.findElement(freezedAnnotation)
+        val annotationElement = file.findElement(FREEZED_ANNOTATION)
 
         @Suppress("UNCHECKED_CAST")
         val lineMarker: LineMarkerInfo<PsiElement> =
@@ -77,20 +79,20 @@ void someFunction() {}
     }
 
     ///<editor-fold desc="Helper functions">
-    private fun givenRunBuilderRunnerLineMarkerProvider(
-        navigationHandler: GutterIconNavigationHandler<PsiElement> = givenGutterIconNavigationHandler()
+    private fun newRunBuilderRunnerLineMarkerProvider(
+        navigationHandler: GutterIconNavigationHandler<PsiElement> = newGutterIconNavigationHandler()
     ) = RunBuilderRunnerLineMarkerProvider(
-        navigationHandler = navigationHandler,
-        knownAnnotations = KnownAnnotations()
+        createNavigationHandler = { navigationHandler },
+        knownAnnotations = BuildRunnerBuildKnownAnnotations()
     )
 
-    private fun givenGutterIconNavigationHandler(): GutterIconNavigationHandler<PsiElement> =
+    private fun newGutterIconNavigationHandler(): GutterIconNavigationHandler<PsiElement> =
         mockk<GutterIconNavigationHandler<PsiElement>>()
 
     private fun PsiFile.findElement(code: String) =
         findElementAt(text.indexOf(code))!!
 
-    private fun givenFileWithContent(@Language("dart") code: String): PsiFile =
+    private fun dartFileWithContent(@Language("dart") code: String): PsiFile =
         myFixture.configureByText(
             DartFileType.INSTANCE,
             //language=dart
@@ -104,7 +106,7 @@ void someFunction() {}
 ///</editor-fold>
 
     companion object {
-        private const val freezedAnnotation = "@freezed"
+        private const val FREEZED_ANNOTATION = "@freezed"
     }
 }
 
