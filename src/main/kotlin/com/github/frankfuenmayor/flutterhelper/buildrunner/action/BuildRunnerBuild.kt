@@ -1,8 +1,9 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner.action
 
 import com.github.frankfuenmayor.flutterhelper.buildrunner.configurations.BuildRunnerBuildCommandLineProvider
-import com.github.frankfuenmayor.flutterhelper.ui.DartBuildRunnerOutputWindowManager
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.*
+import com.intellij.execution.ui.ConsoleView
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
@@ -15,7 +16,10 @@ typealias FindPubspecYamlFile = (project: Project, virtualFile: VirtualFile) -> 
 
 class BuildRunnerBuild(
     private val commandLineProvider: BuildRunnerBuildCommandLineProvider = BuildRunnerBuildCommandLineProvider(),
-    private val findPubspecYamlFile: FindPubspecYamlFile = PubspecYamlUtil::findPubspecYamlFile
+    private val findPubspecYamlFile: FindPubspecYamlFile = PubspecYamlUtil::findPubspecYamlFile,
+    private val createProcessHandler: (GeneralCommandLine) -> BaseProcessHandler<Process> = {
+        ProcessHandlerFactory.getInstance().createColoredProcessHandler(it)
+    }
 ) {
     operator fun invoke(
         project: Project,
@@ -38,20 +42,16 @@ class BuildRunnerBuild(
             )
 
         val processHandler: BaseProcessHandler<Process> =
-            ProcessHandlerFactory.getInstance()
-                .createColoredProcessHandler(generalCommandLine)
-
-        val consoleView =
-            DartBuildRunnerOutputWindowManager.getConsoleView(project)
+            createProcessHandler(generalCommandLine)
 
         val toolWindow =
             ToolWindowManager.getInstance(project)
                 .getToolWindow("Build Runner")
 
         toolWindow?.title = "Dart Build Runner Output"
-
         toolWindow?.show()
 
+        val consoleView = toolWindow?.contentManager?.contents?.firstOrNull()?.component as ConsoleView?
 
         processHandler.addProcessListener(object : ProcessAdapter() {
             override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {

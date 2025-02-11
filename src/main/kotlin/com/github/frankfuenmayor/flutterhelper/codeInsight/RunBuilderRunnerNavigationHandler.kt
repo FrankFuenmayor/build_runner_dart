@@ -15,11 +15,11 @@ import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 import javax.swing.JSeparator
 
+
 class RunBuilderRunnerNavigationHandler(
-    private val createPopupMenu: (PsiElement) -> JPopupMenu = { psiElement ->
-        createPopupMenuForElement(
-            psiElement
-        )
+    private val buildRunnerBuild: BuildRunnerBuild = BuildRunnerBuild(),
+    private val createPopupMenu: (PsiElement, onBuild: (deleteConflictingOutputs: Boolean, List<String>) -> Unit) -> JPopupMenu = { element, onBuild ->
+        createPopupMenuForElement(psiElement = element, onBuild = onBuild)
     }
 ) : GutterIconNavigationHandler<PsiElement> {
 
@@ -50,15 +50,22 @@ class RunBuilderRunnerNavigationHandler(
 //
 //        psiElement.setRunning(true)
 
-        createPopupMenu(psiElement).show(e.component, e.x, e.y)
+        createPopupMenu(psiElement) { deleteConflictingOutputs, buildFilter ->
+            buildRunnerBuild(
+                project = psiElement.project,
+                virtualFile = psiElement.containingFile.virtualFile,
+                buildFilter = buildFilter,
+                deleteConflictingOutputs = deleteConflictingOutputs
+            )
+        }.show(e.component, e.x, e.y)
     }
 }
 
 
 private fun createPopupMenuForElement(
     psiElement: PsiElement,
-    buildRunnerBuild: BuildRunnerBuild = BuildRunnerBuild(),
-    knownAnnotations: BuildRunnerBuildKnownAnnotations = BuildRunnerBuildKnownAnnotations()
+    knownAnnotations: BuildRunnerBuildKnownAnnotations = BuildRunnerBuildKnownAnnotations(),
+    onBuild: (deleteConflictingOutputs: Boolean, buildFilter: List<String>) -> Unit
 ): JPopupMenu {
 
     val annotationIdentifier = psiElement.nextSibling.text
@@ -88,35 +95,43 @@ private fun createPopupMenuForElement(
 
         add(header.also { isEnabled = false })
 
-        buildRunnerAnnotation.filePatterns.map {
+        val filter = buildRunnerAnnotation.filePatterns.map {
             val outputFilename = it.replace("*", filenameWithoutExtension)
-            val generatedFilename = folder + File.separator + outputFilename
-
-            val item = JMenuItem("Generate $outputFilename")
-
-            item.addActionListener {
-                buildRunnerBuild(
-                    project = psiElement.project,
-                    virtualFile = elementVirtualFile,
-                    buildFilter = listOf(generatedFilename),
-                    deleteConflictingOutputs = false
-                )
-            }
-
-            add(item)
+            outputFilename to folder + File.separator + outputFilename
         }
 
+
+        val allFilesItem = JMenuItem("Generate File${if (filter.size > 1) "(s)" else ""}")
+
+        allFilesItem.addActionListener {
+            onBuild(false, filter.map { it.second })
+        }
+
+        add(allFilesItem)
         add(JSeparator())
 
+        if (filter.size > 1) {
+            filter.forEach {
+                val outputFilename = it.first
+                val generatedFilename = it.second
+
+                val item = JMenuItem("Generate $outputFilename")
+
+                item.addActionListener {
+                    onBuild(false, listOf(generatedFilename))
+                }
+
+                add(item)
+            }
+
+            add(JSeparator())
+        }
+
         val generateAll = JMenuItem(
-            "Generate All (delete conflicting outputs)"
+            "Generate all files in $dartProjectName (delete conflicting outputs)"
         ).apply {
             addActionListener {
-                buildRunnerBuild(
-                    project = psiElement.project,
-                    virtualFile = elementVirtualFile,
-                    deleteConflictingOutputs = true
-                )
+                onBuild(true, emptyList())
             }
         }
 
