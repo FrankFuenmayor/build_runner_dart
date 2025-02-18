@@ -15,12 +15,12 @@ class BuildRunnerBuildCommandLineProviderTest : BasePlatformTestCase() {
             provider.getCommandLine(
                 project = project,
                 File("/somedir"),
-                deleteConflictingOutputs = deleteConflictingOutputs
+                deleteConflictingOutputs = false
             )
 
         TestCase.assertEquals(
             "/home/user1/dart run build_runner build",
-            commandLine?.commandLineString
+            commandLine.commandLineString
         )
     }
 }

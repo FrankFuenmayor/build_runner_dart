@@ -89,9 +89,6 @@ class RunBuilderRunnerLineMarkerProviderTest : BasePlatformTestCase() {
     private fun newGutterIconNavigationHandler(): GutterIconNavigationHandler<PsiElement> =
         mockk<GutterIconNavigationHandler<PsiElement>>()
 
-    private fun PsiFile.findElement(code: String) =
-        findElementAt(text.indexOf(code))!!
-
     private fun dartFileWithContent(@Language("dart") code: String): PsiFile =
         myFixture.configureByText(
             DartFileType.INSTANCE,
@@ -110,4 +107,4 @@ class RunBuilderRunnerLineMarkerProviderTest : BasePlatformTestCase() {
     }
 }
 
-
+fun PsiFile.findElement(code: String) = findElementAt(text.indexOf(code))!!

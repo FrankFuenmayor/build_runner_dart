@@ -25,5 +25,7 @@
 
         <notificationGroup id="Flutter Helper Notification Group"
                            displayType="BALLOON"/>
+
+<!--        https://chatgpt.com/share/67aace7d-ad40-800b-99a5-b30988500854-->
     </extensions>
 </idea-plugin>
