@@ -9,6 +9,4 @@ object DartBuildRunnerOutputWindowManager {
     fun register(project: Project, consoleView: ConsoleView) {
         consoleViews[project] = consoleView
     }
-
-    fun getConsoleView(project: Project): ConsoleView? = consoleViews[project]
 }

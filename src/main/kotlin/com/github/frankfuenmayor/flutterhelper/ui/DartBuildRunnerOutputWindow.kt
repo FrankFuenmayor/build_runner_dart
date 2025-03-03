@@ -13,7 +13,5 @@ class DartBuildRunnerOutputWindow : ToolWindowFactory, DumbAware {
         val contentFactory = ContentFactory.getInstance()
         val content = contentFactory.createContent(consoleView.component, "", false)
         toolWindow.contentManager.addContent(content)
-
-        DartBuildRunnerOutputWindowManager.register(project, consoleView)
     }
 }
