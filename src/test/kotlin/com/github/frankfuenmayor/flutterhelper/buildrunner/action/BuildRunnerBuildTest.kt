@@ -1,3 +1,0 @@
-package com.github.frankfuenmayor.flutterhelper.buildrunner.action
-
-class BuildRunnerBuildTest

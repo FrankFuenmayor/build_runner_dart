@@ -11,13 +11,14 @@ import org.intellij.lang.annotations.Language
 import java.awt.Component
 import java.awt.Point
 import java.awt.event.MouseEvent
+import javax.swing.JPopupMenu
 
 class RunBuilderRunnerNavigationHandlerTest : BasePlatformTestCase() {
 
-    fun `test - TBD`() {
-        val buildRunnerBuild = mockk<BuildRunnerBuild>()
-
-        val createPopupMenu = mockk<CreateBuildRunnerPopupMenu>(relaxed = true)
+    fun `test - navigate successfully`() {
+        val buildRunnerBuild = mockBuildRunnerBuild()
+        val createPopupMenu = mockCreateBuildRunnerPopupMenu()
+        val mouseEvent = mockMouseEvent()
 
         val navigationHandler = RunBuilderRunnerNavigationHandler(
             buildRunnerBuild = buildRunnerBuild,
@@ -32,13 +33,24 @@ class RunBuilderRunnerNavigationHandlerTest : BasePlatformTestCase() {
         )
 
         val annotationElement = file.findElement("@freezed")
-        val mouseEvent = mockMouseEvent()
+        val popupMenu = mockk<JPopupMenu>(relaxed = true)
+
+        every { createPopupMenu(annotationElement, any()) } returns popupMenu
 
         navigationHandler.navigate(mouseEvent, annotationElement)
 
         verify {
             createPopupMenu.invoke(annotationElement, any())
+            popupMenu.show(any(), any(), any())
         }
+    }
+
+    private fun mockBuildRunnerBuild() = mockk<BuildRunnerBuild>()
+
+    private fun mockCreateBuildRunnerPopupMenu(): CreateBuildRunnerPopupMenu {
+        val m = mockk<CreateBuildRunnerPopupMenu>()
+        every { m.invoke(any(), any()) } returns mockk()
+        return m
     }
 
     private fun mockMouseEvent(): MouseEvent {
