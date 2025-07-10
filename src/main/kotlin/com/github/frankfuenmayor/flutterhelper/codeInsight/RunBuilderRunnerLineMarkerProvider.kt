@@ -30,7 +30,7 @@ class RunBuilderRunnerLineMarkerProvider(
 
         val annotationIdentifier = psiElement.nextSibling.text
 
-        if (knownAnnotations.findAnnotation(annotationIdentifier) == null) {
+        if (!knownAnnotations.isKnown(annotationIdentifier)) {
             return null
         }
 

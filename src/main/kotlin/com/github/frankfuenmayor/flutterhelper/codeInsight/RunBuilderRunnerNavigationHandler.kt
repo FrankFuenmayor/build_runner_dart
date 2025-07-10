@@ -1,13 +1,15 @@
 package com.github.frankfuenmayor.flutterhelper.codeInsight
 
 import com.github.frankfuenmayor.flutterhelper.buildrunner.action.BuildRunnerBuild
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
 import com.jetbrains.lang.dart.DartTokenTypes
 import java.awt.event.MouseEvent
-
 
 class RunBuilderRunnerNavigationHandler(
     private val buildRunnerBuild: BuildRunnerBuild = BuildRunnerBuild(),
@@ -28,12 +30,31 @@ class RunBuilderRunnerNavigationHandler(
         assert(psiElement.elementType == DartTokenTypes.AT)
 
         createPopupMenu(psiElement) { deleteConflictingOutputs, buildFilter ->
+            psiElement.setRunning(true)
             buildRunnerBuild(
                 project = psiElement.project,
                 virtualFile = psiElement.containingFile.virtualFile,
                 buildFilter = buildFilter,
-                deleteConflictingOutputs = deleteConflictingOutputs
+                deleteConflictingOutputs = deleteConflictingOutputs,
+                onBuildEnd = {
+                    psiElement.setRunning(false)
+                    // Refresh the gutter icons
+                    refreshGutterIcons(psiElement)
+                }
             )
         }.show(e.component, e.x, e.y)
+    }
+
+    private fun refreshGutterIcons(psiElement: PsiElement) {
+        val project = psiElement.project
+        val file = psiElement.containingFile.virtualFile
+        
+        // Get the current editor for the file
+        val editor = FileEditorManager.getInstance(project).getSelectedEditor(file) as? Editor
+        
+        // Refresh the code analysis which will update the gutter icons
+        if (editor != null) {
+            DaemonCodeAnalyzer.getInstance(project).restart(psiElement.containingFile)
+        }
     }
 }

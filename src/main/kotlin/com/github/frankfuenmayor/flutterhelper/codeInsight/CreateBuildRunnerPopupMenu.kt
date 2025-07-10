@@ -3,6 +3,7 @@ package com.github.frankfuenmayor.flutterhelper.codeInsight
 import com.github.frankfuenmayor.flutterhelper.settings.BuildRunnerBuildKnownAnnotations
 import com.intellij.icons.AllIcons
 import com.intellij.psi.PsiElement
+import com.intellij.util.ui.UIUtil
 import com.jetbrains.lang.dart.util.PubspecYamlUtil
 import icons.DartIcons
 import java.io.File
@@ -39,8 +40,10 @@ class CreateBuildRunnerPopupMenu(
 
             val header =
                 JMenuItem(
-                    "<html><small>package: ${dartProjectName}</small></html>"
-                ).apply { isEnabled = false }
+                    "<html><small>package: ${dartProjectName}</small></html>",
+                ).apply {
+                    isEnabled = false
+                }
 
             add(header)
 
@@ -49,7 +52,9 @@ class CreateBuildRunnerPopupMenu(
                 outputFilename to folder + File.separator + outputFilename
             }
 
-            val allFilesItem = JMenuItem("Generate File${if (filter.size > 1) "(s)" else ""}", DartIcons.Dart_file)
+            val allFilesItem = JMenuItem("Generate File${if (filter.size > 1) "(s)" else ""}", DartIcons.Dart_file).apply {
+                foreground = UIUtil.getContextHelpForeground()
+            }
 
             allFilesItem.addActionListener {
                 onBuild(false, filter.map { it.second })

@@ -5,8 +5,10 @@ import com.github.frankfuenmayor.flutterhelper.buildrunner.process.BuildRunnerPr
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.BaseProcessHandler
 import com.intellij.execution.process.ProcessHandlerFactory
+import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.wm.ToolWindowManager
 import com.jetbrains.lang.dart.util.PubspecYamlUtil
 import java.io.File
 
@@ -42,18 +44,42 @@ class BuildRunnerBuild(
         val processHandler: BaseProcessHandler<Process> =
             createProcessHandler(generalCommandLine)
 
+        val consoleView = project.getConsoleView()
+            ?: throw RuntimeException("Console view not found")
+
+        consoleView.clear()
+
         processHandler.addProcessListener(
             BuildRunnerProcessListener(
-                project = project,
-                runAgain = { invoke(
-                    project = project,
-                    virtualFile = virtualFile,
-                    deleteConflictingOutputs = true,
-                    onBuildEnd = onBuildEnd
-                )},
-                onBuildEnd = onBuildEnd
+                consoleView = consoleView,
+                runAgain = {
+                    invoke(
+                        project = project,
+                        virtualFile = virtualFile,
+                        deleteConflictingOutputs = true,
+                        onBuildEnd = onBuildEnd
+                    )
+                },
+                onBuildEnd = {
+
+                    onBuildEnd()
+                }
             )
         )
         processHandler.startNotify()
     }
+}
+
+private fun Project.getConsoleView(): ConsoleView? {
+    val toolWindow =
+        ToolWindowManager.getInstance(this)
+            .getToolWindow("Build Runner")
+
+    toolWindow?.title = "Dart Build Runner Output"
+    toolWindow?.show()
+    return toolWindow
+        ?.contentManager
+        ?.contents
+        ?.firstOrNull()
+        ?.component as ConsoleView?
 }

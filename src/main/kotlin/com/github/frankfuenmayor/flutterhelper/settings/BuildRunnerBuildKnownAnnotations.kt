@@ -1,10 +1,18 @@
 package com.github.frankfuenmayor.flutterhelper.settings
 
 class BuildRunnerBuildKnownAnnotations(
-    private val settingsService: SettingsService = SettingsService.getInstance()
+    settingsService: SettingsService = SettingsService.getInstance()
 ) {
-    fun findAnnotation(annotationIdentifier: String) = settingsService
-        .state
+
+    val settings = settingsService.state
+
+    fun isKnown(annotationIdentifier: String) = settings
+        .buildRunnerBuildRunnerAnnotations
+        .any { knownAnnotation ->
+            knownAnnotation.identifier == annotationIdentifier
+        }
+
+    fun findAnnotation(annotationIdentifier: String) = settings
         .buildRunnerBuildRunnerAnnotations
         .find { knownAnnotation ->
             knownAnnotation.identifier == annotationIdentifier
