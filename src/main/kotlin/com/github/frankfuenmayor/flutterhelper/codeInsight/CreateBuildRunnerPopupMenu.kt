@@ -36,13 +36,13 @@ class CreateBuildRunnerPopupMenu(
 
         val items = mutableListOf<String>()
 
-        val filter = buildRunnerAnnotation.filePatterns.map {
+        val filters = buildRunnerAnnotation.filePatterns.map {
             val outputFilename = it.replace("*", filenameWithoutExtension)
             outputFilename to folder + File.separator + outputFilename
         }
 
-        if (filter.isNotEmpty()) {
-            filter.forEach {
+        if (filters.isNotEmpty()) {
+            filters.forEach {
                 val outputFilename = it.first
                 items.add("Generate '$outputFilename'")
             }
@@ -53,19 +53,21 @@ class CreateBuildRunnerPopupMenu(
             elementVirtualFile
         )?.let { PubspecYamlUtil.getDartProjectName(it) }
 
+        if(filters.size > 1){
+            items.add("Generate all file(s) in '$dartProjectName'")
+        }
 
-        items.add("Generate all file(s) in '$dartProjectName'")
         items.add("Generate all file(s) in '$dartProjectName' (delete conflicting outputs)")
 
         return JBPopupFactory.getInstance().createPopupChooserBuilder(items)
             .setItemChosenCallback { item ->
                 val index = items.indexOf(item)
 
-                if (index < filter.size) {
-                    onBuild(false, listOf(filter[index].second))
+                if (index < filters.size) {
+                    onBuild(false, listOf(filters[index].second))
                 } else {
                     val deleteConflictingOutputs = index == items.size - 1
-                    val buildFilter = if (deleteConflictingOutputs) emptyList() else filter.map { it.second }
+                    val buildFilter = if (deleteConflictingOutputs) emptyList() else filters.map { it.second }
                     onBuild(deleteConflictingOutputs, buildFilter)
                 }
 

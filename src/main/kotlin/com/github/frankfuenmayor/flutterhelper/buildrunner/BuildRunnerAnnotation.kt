@@ -11,8 +11,8 @@ class BuildRunnerAnnotation(identifier: String, var filePatterns: List<String>) 
             jsonBuildRunnerAnnotation,
             freezedBuildRunnerAnnotation,
             unfreezedBuildRunnerAnnotation,
-            generateMocks,
-            generateNiceMocks
+            mockitoGenerateMocks,
+            mockitoGenerateNiceMocks
         )
     }
 
@@ -43,12 +43,12 @@ private val jsonBuildRunnerAnnotation = BuildRunnerAnnotation(
     filePatterns = listOf("*.g.dart")
 )
 
-private val generateMocks = BuildRunnerAnnotation(
+private val mockitoGenerateMocks = BuildRunnerAnnotation(
     identifier = "GenerateMocks",
     filePatterns = listOf("*.mocks.dart")
 )
 
-private val generateNiceMocks = BuildRunnerAnnotation(
+private val mockitoGenerateNiceMocks = BuildRunnerAnnotation(
     identifier = "GenerateNiceMocks",
     filePatterns = listOf("*.mocks.dart")
 )
