@@ -1,15 +1,18 @@
+@file:Suppress("KotlinUnreachableCode")
+
 package com.github.frankfuenmayor.flutterhelper.codeInsight
 
 import com.github.frankfuenmayor.flutterhelper.settings.BuildRunnerBuildKnownAnnotations
-import com.intellij.icons.AllIcons
+import com.intellij.openapi.ui.popup.JBPopup
+import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.psi.PsiElement
-import com.intellij.util.ui.UIUtil
+import com.intellij.util.ui.JBUI
 import com.jetbrains.lang.dart.util.PubspecYamlUtil
 import icons.DartIcons
 import java.io.File
-import javax.swing.JMenuItem
-import javax.swing.JPopupMenu
-import javax.swing.JSeparator
+import javax.swing.JLabel
+import javax.swing.ListCellRenderer
+import javax.swing.border.EmptyBorder
 
 class CreateBuildRunnerPopupMenu(
     private val knownAnnotations: BuildRunnerBuildKnownAnnotations = BuildRunnerBuildKnownAnnotations(),
@@ -17,12 +20,12 @@ class CreateBuildRunnerPopupMenu(
     operator fun invoke(
         psiElement: PsiElement,
         onBuild: (deleteConflictingOutputs: Boolean, List<String>) -> Unit
-    ): JPopupMenu {
+    ): JBPopup? {
 
         val annotationIdentifier = psiElement.nextSibling.text
 
         val buildRunnerAnnotation =
-            knownAnnotations.findAnnotation(annotationIdentifier) ?: return JPopupMenu()
+            knownAnnotations.findAnnotation(annotationIdentifier) ?: return null
 
         val folder = psiElement.containingFile.parent?.virtualFile?.path
 
@@ -31,64 +34,54 @@ class CreateBuildRunnerPopupMenu(
 
         val elementVirtualFile = psiElement.containingFile.virtualFile
 
-        return JPopupMenu("build runner build").apply {
+        val items = mutableListOf<String>()
 
-            val dartProjectName = PubspecYamlUtil.findPubspecYamlFile(
-                psiElement.project,
-                elementVirtualFile
-            )?.let { PubspecYamlUtil.getDartProjectName(it) }
-
-            val header =
-                JMenuItem(
-                    "<html><small>package: ${dartProjectName}</small></html>",
-                ).apply {
-                    isEnabled = false
-                }
-
-            add(header)
-
-            val filter = buildRunnerAnnotation.filePatterns.map {
-                val outputFilename = it.replace("*", filenameWithoutExtension)
-                outputFilename to folder + File.separator + outputFilename
-            }
-
-            val allFilesItem = JMenuItem("Generate File${if (filter.size > 1) "(s)" else ""}", DartIcons.Dart_file).apply {
-                foreground = UIUtil.getContextHelpForeground()
-            }
-
-            allFilesItem.addActionListener {
-                onBuild(false, filter.map { it.second })
-            }
-
-            add(allFilesItem)
-            add(JSeparator())
-
-            if (filter.size > 1) {
-                filter.forEach {
-                    val outputFilename = it.first
-                    val generatedFilename = it.second
-
-                    val item = JMenuItem("Generate $outputFilename", DartIcons.Dart_file)
-                    item.addActionListener {
-                        onBuild(false, listOf(generatedFilename))
-                    }
-                    add(item)
-                }
-                add(JSeparator())
-            }
-
-            val generateAll = JMenuItem(
-                "Generate all files in $dartProjectName (delete conflicting outputs)",
-                AllIcons.Actions.GeneratedFolder
-            ).apply {
-                addActionListener {
-                    onBuild(true, emptyList())
-                }
-            }
-
-            add(
-                generateAll
-            )
+        val filter = buildRunnerAnnotation.filePatterns.map {
+            val outputFilename = it.replace("*", filenameWithoutExtension)
+            outputFilename to folder + File.separator + outputFilename
         }
+
+        if (filter.isNotEmpty()) {
+            filter.forEach {
+                val outputFilename = it.first
+                items.add("Generate '$outputFilename'")
+            }
+        }
+
+        val dartProjectName = PubspecYamlUtil.findPubspecYamlFile(
+            psiElement.project,
+            elementVirtualFile
+        )?.let { PubspecYamlUtil.getDartProjectName(it) }
+
+
+        items.add("Generate all file(s) in '$dartProjectName'")
+        items.add("Generate all file(s) in '$dartProjectName' (delete conflicting outputs)")
+
+        return JBPopupFactory.getInstance().createPopupChooserBuilder(items)
+            .setItemChosenCallback { item ->
+                val index = items.indexOf(item)
+
+                if (index < filter.size) {
+                    onBuild(false, listOf(filter[index].second))
+                } else {
+                    val deleteConflictingOutputs = index == items.size - 1
+                    val buildFilter = if (deleteConflictingOutputs) emptyList() else filter.map { it.second }
+                    onBuild(deleteConflictingOutputs, buildFilter)
+                }
+
+
+            }.setRenderer(ListCellRenderer { list, value, index, isSelected, cellHasFocus ->
+                @Suppress("UseDPIAwareBorders")
+                val paddingBorder: EmptyBorder = JBUI.Borders.empty(4, 4)
+                JLabel(
+                    value,
+                    DartIcons.Dart_file,
+                    JLabel.LEFT
+                ).apply {
+                    border = paddingBorder
+                }
+            })
+            .setTitle("Build Runner Build")
+            .createPopup()
     }
 }

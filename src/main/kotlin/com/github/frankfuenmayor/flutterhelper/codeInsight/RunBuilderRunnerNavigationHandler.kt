@@ -3,12 +3,11 @@ package com.github.frankfuenmayor.flutterhelper.codeInsight
 import com.github.frankfuenmayor.flutterhelper.buildrunner.action.BuildRunnerBuild
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
 import com.jetbrains.lang.dart.DartTokenTypes
+import java.awt.Point
 import java.awt.event.MouseEvent
 
 class RunBuilderRunnerNavigationHandler(
@@ -37,24 +36,16 @@ class RunBuilderRunnerNavigationHandler(
                 buildFilter = buildFilter,
                 deleteConflictingOutputs = deleteConflictingOutputs,
                 onBuildEnd = {
-                    psiElement.setRunning(false)
-                    // Refresh the gutter icons
                     refreshGutterIcons(psiElement)
                 }
             )
-        }.show(e.component, e.x, e.y)
+        }?.showInScreenCoordinates(e.component, Point(e.xOnScreen, e.yOnScreen))
     }
 
     private fun refreshGutterIcons(psiElement: PsiElement) {
+        psiElement.setRunning(false)
         val project = psiElement.project
-        val file = psiElement.containingFile.virtualFile
-        
-        // Get the current editor for the file
-        val editor = FileEditorManager.getInstance(project).getSelectedEditor(file) as? Editor
-        
-        // Refresh the code analysis which will update the gutter icons
-        if (editor != null) {
-            DaemonCodeAnalyzer.getInstance(project).restart(psiElement.containingFile)
-        }
+        DaemonCodeAnalyzer.getInstance(project).restart(psiElement.containingFile)
+
     }
 }
