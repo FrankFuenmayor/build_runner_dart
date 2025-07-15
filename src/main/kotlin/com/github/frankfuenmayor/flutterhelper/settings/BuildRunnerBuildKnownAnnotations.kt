@@ -7,13 +7,13 @@ class BuildRunnerBuildKnownAnnotations(
     val settings = settingsService.state
 
     fun isKnown(annotationIdentifier: String) = settings
-        .buildRunnerBuildRunnerAnnotations
+        .annotations
         .any { knownAnnotation ->
             knownAnnotation.identifier == annotationIdentifier
         }
 
     fun findAnnotation(annotationIdentifier: String) = settings
-        .buildRunnerBuildRunnerAnnotations
+        .annotations
         .find { knownAnnotation ->
             knownAnnotation.identifier == annotationIdentifier
         }

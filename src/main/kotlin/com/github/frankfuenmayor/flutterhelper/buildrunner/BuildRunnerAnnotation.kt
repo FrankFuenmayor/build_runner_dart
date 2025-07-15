@@ -1,9 +1,30 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner
 
 
-class BuildRunnerAnnotation(identifier: String, var filePatterns: List<String>) {
+class BuildRunnerAnnotationBuilder {
+    private var identifier = ""
+    private var filePatterns = emptyList<String>()
 
-    val identifier = identifier.removePrefix("@")
+    fun identifier(identifier: String) = apply {
+        this.identifier = identifier
+    }
+
+    fun filePatterns(filePatterns: List<String>) = apply {
+        this.filePatterns = filePatterns
+    }
+
+    fun build() = BuildRunnerAnnotation(identifier, filePatterns)
+}
+
+
+class BuildRunnerAnnotation(identifier: String, var filePatterns: List<String> = emptyList()) {
+
+    private var _identifier = identifier.removePrefix("@")
+    var identifier: String
+        get() = _identifier.removePrefix("@")
+        set(value) {
+            _identifier = value.removePrefix("@")
+        }
 
     companion object {
         @JvmStatic
