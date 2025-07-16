@@ -3,7 +3,10 @@ package com.github.frankfuenmayor.flutterhelper.codeInsight
 import com.github.frankfuenmayor.flutterhelper.codeInsight.RunBuilderRunnerNavigationHandler.Companion.isRunning
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
-import com.intellij.icons.ExpUiIcons
+import com.intellij.icons.AllIcons
+import com.intellij.icons.AllIcons.Run.Restart
+import com.intellij.icons.AllIcons.Run.Stop
+
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.psi.PsiElement
 import javax.swing.Icon
@@ -14,7 +17,7 @@ class BuildRunnerLineMarkerInfo(
 ) : LineMarkerInfo<PsiElement>(
     psiElement,
     psiElement.textRange,
-    ExpUiIcons.Run.Run,
+    AllIcons.Run.Restart,
     { "Run build_runner build" },
     navigationHandler,
     GutterIconRenderer.Alignment.LEFT,
@@ -23,7 +26,7 @@ class BuildRunnerLineMarkerInfo(
 
     override fun createGutterRenderer(): GutterIconRenderer = object : LineMarkerGutterIconRenderer<PsiElement>(this) {
         override fun getIcon(): Icon {
-            return if (this.lineMarkerInfo.element?.isRunning == true) ExpUiIcons.Run.Stop else ExpUiIcons.Run.Run
+            return if (this.lineMarkerInfo.element?.isRunning == true) Stop else Restart
         }
     }
 }

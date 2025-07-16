@@ -1,31 +1,8 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner
 
+import java.io.Serializable
 
-class BuildRunnerAnnotationBuilder {
-    private var identifier = ""
-    private var filePatterns = emptyList<String>()
-
-    fun identifier(identifier: String) = apply {
-        this.identifier = identifier
-    }
-
-    fun filePatterns(filePatterns: List<String>) = apply {
-        this.filePatterns = filePatterns
-    }
-
-    fun build() = BuildRunnerAnnotation(identifier, filePatterns)
-}
-
-
-class BuildRunnerAnnotation(identifier: String, var filePatterns: List<String> = emptyList()) {
-
-    private var _identifier = identifier.removePrefix("@")
-    var identifier: String
-        get() = _identifier.removePrefix("@")
-        set(value) {
-            _identifier = value.removePrefix("@")
-        }
-
+data class BuildRunnerAnnotation(var identifier: String = "", var filePatterns: List<String> = emptyList()) : Serializable{
     companion object {
         @JvmStatic
         val builtIns = listOf(
@@ -35,17 +12,6 @@ class BuildRunnerAnnotation(identifier: String, var filePatterns: List<String> =
             mockitoGenerateMocks,
             mockitoGenerateNiceMocks
         )
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        other as BuildRunnerAnnotation
-        return identifier == other.identifier
-    }
-
-    override fun hashCode(): Int {
-        return identifier.hashCode()
     }
 }
 

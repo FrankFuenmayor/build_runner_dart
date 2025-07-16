@@ -26,17 +26,6 @@ public class SettingsPanel implements Configurable {
         List<@NotNull BuildRunnerAnnotation> initialAnnotations = SettingsService.Companion.getInstance().getState().annotations;
         model = new AnnotationsTableModel(initialAnnotations);
         annotationsTable.setModel(model);
-        annotationsTable.setCellEditor(new AbstractTableCellEditor() {
-            @Override
-            public Object getCellEditorValue() {
-                return "dsasdsdasd";
-            }
-
-            @Override
-            public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-                return new JTextField();
-            }
-        });
 
         model.addTableModelListener(e -> {
             isModified = true;
