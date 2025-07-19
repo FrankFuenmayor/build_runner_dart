@@ -19,6 +19,12 @@
                 displayName="Flutter Helper"
                 instance="com.github.frankfuenmayor.flutterhelper.settings.SettingsPanel"/>
 
+        <applicationConfigurable
+                displayName="Flutter Helper 2"
+                instance="com.github.frankfuenmayor.flutterhelper.buildrunner.options.BuildRunnerBuildConfigurable"/>
+
+
+
         <toolWindow id="Build Runner"
                     anchor="bottom"
                     factoryClass="com.github.frankfuenmayor.flutterhelper.ui.DartBuildRunnerOutputWindow"/>

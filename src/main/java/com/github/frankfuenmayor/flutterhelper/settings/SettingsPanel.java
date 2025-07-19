@@ -1,7 +1,6 @@
 package com.github.frankfuenmayor.flutterhelper.settings;
 
 import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerAnnotation;
-import com.intellij.util.ui.AbstractTableCellEditor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,29 +8,39 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
+import com.github.frankfuenmayor.flutterhelper.buildrunner.Icons;
 import com.intellij.openapi.options.Configurable;
+import com.intellij.util.ui.AbstractTableCellEditor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class SettingsPanel implements Configurable {
     JPanel rootPanel;
     private JTable annotationsTable;
-    private JLabel lblPlus;
+    private JButton button1;
 
     AnnotationsTableModel model;
 
-    private boolean isModified = false;
-
     public SettingsPanel() {
         List<@NotNull BuildRunnerAnnotation> initialAnnotations = SettingsService.Companion.getInstance().getState().annotations;
+
+button1.setIcon(Icons.Add);
+
         model = new AnnotationsTableModel(initialAnnotations);
         annotationsTable.setModel(model);
+        annotationsTable.setCellEditor(new AbstractTableCellEditor() {
+            @Override
+            public Object getCellEditorValue() {
+                return null;
+            }
 
-        model.addTableModelListener(e -> {
-            isModified = true;
+            @Override
+            public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+                return new JTextField();
+            }
         });
 
-        lblPlus.addMouseListener(new MouseAdapter() {
+        button1.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 model.addRow();
@@ -53,7 +62,6 @@ public class SettingsPanel implements Configurable {
         SettingsService
                 .getInstance()
                 .setAnnotations(model.getAnnotations());
-
     }
 
     @Override
