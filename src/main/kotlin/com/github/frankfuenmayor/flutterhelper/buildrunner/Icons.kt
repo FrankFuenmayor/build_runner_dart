@@ -11,4 +11,8 @@ object Icons {
     val RunError: Icon = IconLoader.getIcon("/icons/run_error.svg", Icons::class.java)
     @JvmField
     val Add: Icon = IconLoader.getIcon("/icons/add.svg", Icons::class.java)
+    @JvmField
+    val Build: Icon = IconLoader.getIcon("/icons/build.svg", Icons::class.java)
+    @JvmField
+    val Dart: Icon = IconLoader.getIcon("/icons/dart.svg", Icons::class.java)
 }

@@ -19,8 +19,7 @@ class RunBuilderRunnerNavigationHandler(
         @JvmStatic
         private var isRunningKey = Key.create<Boolean>("build_runner.isRunning")
 
-        val PsiElement.isRunning: Boolean
-            get() = getUserData(isRunningKey) ?: false
+        val PsiElement.isRunning: Boolean get() = getUserData(isRunningKey) ?: false
 
         fun PsiElement.setRunning(value: Boolean) = putUserData(isRunningKey, value)
     }
@@ -35,9 +34,7 @@ class RunBuilderRunnerNavigationHandler(
                 virtualFile = psiElement.containingFile.virtualFile,
                 buildFilter = buildFilter,
                 deleteConflictingOutputs = deleteConflictingOutputs,
-                onBuildEnd = {
-                    refreshGutterIcons(psiElement)
-                }
+                onBuildEnd = { refreshGutterIcons(psiElement) }
             )
         }?.showInScreenCoordinates(e.component, Point(e.xOnScreen, e.yOnScreen))
     }

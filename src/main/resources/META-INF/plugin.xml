@@ -19,7 +19,7 @@
                 displayName="build_runner for Dart settings"
                 instance="com.github.frankfuenmayor.flutterhelper.buildrunner.options.BuildRunnerBuildConfigurable"/>
 
-        <toolWindow id="dart_build_runner"
+        <toolWindow id="dart build_runner"
                     anchor="bottom"
                     factoryClass="com.github.frankfuenmayor.flutterhelper.buildrunner.ui.DartBuildRunnerOutputWindow"/>
 

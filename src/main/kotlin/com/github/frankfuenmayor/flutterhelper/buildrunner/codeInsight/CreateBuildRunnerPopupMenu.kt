@@ -83,7 +83,7 @@ class CreateBuildRunnerPopupMenu(
                     border = paddingBorder
                 }
             })
-            .setTitle("Build Runner Build")
+            .setTitle("dart run build_runner")
             .createPopup()
     }
 }

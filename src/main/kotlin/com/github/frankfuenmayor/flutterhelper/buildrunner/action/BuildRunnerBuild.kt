@@ -1,5 +1,6 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner.action
 
+import com.github.frankfuenmayor.flutterhelper.buildrunner.Icons
 import com.github.frankfuenmayor.flutterhelper.buildrunner.configurations.BuildRunnerBuildCommandLineProvider
 import com.github.frankfuenmayor.flutterhelper.buildrunner.process.BuildRunnerProcessListener
 import com.intellij.execution.configurations.GeneralCommandLine
@@ -65,10 +66,7 @@ class BuildRunnerBuild(
                         onBuildEnd = onBuildEnd
                     )
                 },
-                onBuildEnd = {
-
-                    onBuildEnd()
-                }
+                onBuildEnd = { onBuildEnd() }
             )
         )
         processHandler.startNotify()
@@ -78,10 +76,12 @@ class BuildRunnerBuild(
 private fun Project.getConsoleView(): ConsoleView? {
     val toolWindow =
         ToolWindowManager.getInstance(this)
-            .getToolWindow("dart_build_runner")
+            .getToolWindow("dart build_runner")
 
-    toolWindow?.title = "build_runner"
+
     toolWindow?.show()
+    toolWindow?.setIcon(Icons.Build)
+
     return toolWindow
         ?.contentManager
         ?.contents
