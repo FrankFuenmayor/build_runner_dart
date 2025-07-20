@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindowManager
 import com.jetbrains.lang.dart.util.PubspecYamlUtil
+import org.yaml.snakeyaml.Yaml
 import java.io.File
 
 typealias FindPubspecYamlFile = (project: Project, virtualFile: VirtualFile) -> VirtualFile?
@@ -30,6 +31,10 @@ class BuildRunnerBuild(
     ) {
 
         val yamlFile = findPubspecYamlFile(project, virtualFile) ?: return
+
+        val pubspec = Yaml().loadAs(yamlFile.inputStream, Map::class.java)
+
+        println(pubspec)
 
         val workDirectory = File(yamlFile.parent.path)
 

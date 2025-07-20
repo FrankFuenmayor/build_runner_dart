@@ -10,6 +10,8 @@ object Icons {
     @JvmField
     val Run: Icon = IconLoader.getIcon("/icons/run.svg", Icons::class.java)
     @JvmField
+    val RunError: Icon = IconLoader.getIcon("/icons/run_error.svg", Icons::class.java)
+    @JvmField
     val Add: Icon = IconLoader.getIcon("/icons/add.svg", Icons::class.java)
 }
 

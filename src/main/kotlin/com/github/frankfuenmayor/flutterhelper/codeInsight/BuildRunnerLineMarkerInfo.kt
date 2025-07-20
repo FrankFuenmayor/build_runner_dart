@@ -13,10 +13,11 @@ import javax.swing.Icon
 class BuildRunnerLineMarkerInfo(
     psiElement: PsiElement,
     navigationHandler: GutterIconNavigationHandler<PsiElement>,
+    icon: Icon = Icons.RunError
 ) : LineMarkerInfo<PsiElement>(
     psiElement,
     psiElement.textRange,
-    Icons.Run,
+    icon,
     { "Run build_runner build" },
     navigationHandler,
     GutterIconRenderer.Alignment.LEFT,

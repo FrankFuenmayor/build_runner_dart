@@ -21,7 +21,6 @@ class SettingsService :
             updateState {
                 state.copy(value)
             }
-
         }
 
     companion object {

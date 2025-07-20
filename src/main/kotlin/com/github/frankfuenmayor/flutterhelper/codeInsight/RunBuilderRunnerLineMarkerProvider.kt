@@ -35,8 +35,8 @@ class RunBuilderRunnerLineMarkerProvider(
         }
 
         return BuildRunnerLineMarkerInfo(
-            psiElement,
-            createNavigationHandler(psiElement)
+            psiElement = psiElement,
+            navigationHandler = createNavigationHandler(psiElement),
         )
     }
 }

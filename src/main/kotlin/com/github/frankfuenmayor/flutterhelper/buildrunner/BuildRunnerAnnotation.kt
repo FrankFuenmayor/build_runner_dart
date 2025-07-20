@@ -1,8 +1,13 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner
 
-import java.io.Serializable
+data class BuildRunnerAnnotation(var identifier: String = "", var filePatterns: List<String> = emptyList()) {
 
-data class BuildRunnerAnnotation(var identifier: String = "", var filePatterns: List<String> = emptyList()) : Serializable{
+    val isValid: Boolean
+        get() = identifier.isNotBlank() && filePatterns.isNotEmpty()
+
+    val isBuiltIn: Boolean
+        get() = builtIns.any { it == this }
+
     companion object {
         @JvmStatic
         val builtIns = listOf(

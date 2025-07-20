@@ -2,6 +2,7 @@ package com.github.frankfuenmayor.flutterhelper.buildrunner.options
 
 import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerAnnotation
 import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerAnnotation.Companion.builtIns
+import com.github.frankfuenmayor.flutterhelper.settings.SettingsService
 import com.intellij.openapi.options.Configurable
 import com.intellij.ui.AnActionButton
 import com.intellij.ui.ToolbarDecorator
@@ -10,17 +11,17 @@ import com.intellij.util.ui.ColumnInfo
 import com.intellij.util.ui.ListTableModel
 import org.jetbrains.annotations.Nls
 import javax.swing.JComponent
-import javax.swing.JPanel
+import javax.swing.event.TableModelEvent
 
 class BuildRunnerBuildConfigurable : Configurable {
-    private var mainPanel: JPanel? = null
-    val data = builtIns.toMutableList()
+    private var isModified = false
+    private lateinit var currentAnnotations: List<BuildRunnerAnnotation>
+    private lateinit var tableView: TableView<BuildRunnerAnnotation>
 
-    val model: ListTableModel<BuildRunnerAnnotation?> = ListTableModel<BuildRunnerAnnotation?>(
+    val model: ListTableModel<BuildRunnerAnnotation> = ListTableModel<BuildRunnerAnnotation>(
         AnnotationColumn,
         FilePatternsColumn
     )
-
 
     @Nls
     override fun getDisplayName(): String {
@@ -28,45 +29,52 @@ class BuildRunnerBuildConfigurable : Configurable {
     }
 
     override fun createComponent(): JComponent? {
-        model.addRows(data)
-        val tableView = TableView<BuildRunnerAnnotation>(model)
+
+        currentAnnotations = SettingsService.getInstance().annotations
+        model.addRows(currentAnnotations.toMutableList())
+        tableView = TableView(model)
+
+        model.addTableModelListener { isModified = it.type == TableModelEvent.UPDATE }
+
         return ToolbarDecorator
             .createDecorator(tableView)
             .disableDownAction()
             .disableUpDownActions()
+            .setRemoveActionUpdater { !tableView.items[tableView.selectedRow].isBuiltIn }
             .setRemoveAction { button: AnActionButton? ->
                 val selectedRow = tableView.selectedRow
-
                 if (selectedRow >= 0) {
                     val buildRunnerAnnotation = model.getItem(selectedRow)
                     if (!builtIns.contains(buildRunnerAnnotation)) {
                         model.removeRow(selectedRow)
+                        isModified = true
                     }
                 }
             }
             .setAddAction { button: AnActionButton? ->
-                model.addRow(BuildRunnerAnnotation("", mutableListOf<String>()))
+                model.addRow(BuildRunnerAnnotation())
+                isModified = true
+            }
+            .setEditActionUpdater {
+                !tableView.items[tableView.selectedRow].isBuiltIn
             }
             .createPanel()
     }
 
-    override fun isModified(): Boolean {
-        // TODO: implement persistence logic
-        return false
-    }
+    override fun isModified(): Boolean = isModified
 
     override fun apply() {
-//        SettingsService
-//                .getInstance()
-//                .setAnnotations(model.getAnnotations());
+        SettingsService
+            .getInstance()
+            .annotations = model.items.filter { it.isValid }
+        currentAnnotations = model.items.toList()
+        isModified = false
     }
 
     override fun reset() {
-        // TODO: reset the table to saved values
-    }
-
-    override fun disposeUIResources() {
-        mainPanel = null
+        model.items = currentAnnotations.toMutableList()
+        model.fireTableDataChanged()
+        isModified = false
     }
 }
 
@@ -94,12 +102,12 @@ object FilePatternsColumn : ColumnInfo<BuildRunnerAnnotation, String>("File Patt
         return item.filePatterns.joinToString(", ")
     }
 
-    override fun isCellEditable(item: BuildRunnerAnnotation?): Boolean {
+    override fun isCellEditable(item: BuildRunnerAnnotation): Boolean {
         return builtIns.none { it == item }
     }
 
-    override fun setValue(item: BuildRunnerAnnotation?, value: String?) {
-
+    override fun setValue(item: BuildRunnerAnnotation, value: String) {
+        item.filePatterns = value.split(",")
     }
 
     override fun getColumnClass(): Class<*> {
