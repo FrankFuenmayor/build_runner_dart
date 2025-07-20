@@ -1,7 +1,7 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.frankfuenmayor.flutterhelper</id>
-    <name>flutter_helper</name>
+    <name>build_runner for Dart</name>
     <vendor>frankfuenmayor</vendor>
 
     <depends>com.intellij.modules.platform</depends>
@@ -12,25 +12,21 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <codeInsight.lineMarkerProvider
-                implementationClass="com.github.frankfuenmayor.flutterhelper.codeInsight.RunBuilderRunnerLineMarkerProvider"
+                implementationClass="com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight.RunBuilderRunnerLineMarkerProvider"
                 language="Dart"/>
 
         <applicationConfigurable
-                displayName="Flutter Helper"
-                instance="com.github.frankfuenmayor.flutterhelper.settings.SettingsPanel"/>
-
-        <applicationConfigurable
-                displayName="Flutter Helper 2"
+                displayName="build_runner for Dart settings"
                 instance="com.github.frankfuenmayor.flutterhelper.buildrunner.options.BuildRunnerBuildConfigurable"/>
 
-
-
-        <toolWindow id="Build Runner"
+        <toolWindow id="dart_build_runner"
                     anchor="bottom"
-                    factoryClass="com.github.frankfuenmayor.flutterhelper.ui.DartBuildRunnerOutputWindow"/>
+                    factoryClass="com.github.frankfuenmayor.flutterhelper.buildrunner.ui.DartBuildRunnerOutputWindow"/>
 
-        <notificationGroup id="Flutter Helper Notification Group"
-                           displayType="BALLOON"/>
+        <notificationGroup id="Dart build_runner notification group"
+                           displayType="BALLOON"
+                           bundle="messages.MyBundle"
+                           key="notification.group.dart.build_runner.notification.group"/>
 
         <!--        https://chatgpt.com/share/67aace7d-ad40-800b-99a5-b30988500854-->
     </extensions>

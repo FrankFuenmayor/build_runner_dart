@@ -1,4 +1,4 @@
-package com.github.frankfuenmayor.flutterhelper.ui
+package com.github.frankfuenmayor.flutterhelper.buildrunner.ui
 
 import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.openapi.project.DumbAware

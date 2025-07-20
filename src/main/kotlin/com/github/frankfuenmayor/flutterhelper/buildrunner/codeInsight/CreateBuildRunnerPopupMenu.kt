@@ -1,8 +1,8 @@
 @file:Suppress("KotlinUnreachableCode")
 
-package com.github.frankfuenmayor.flutterhelper.codeInsight
+package com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight
 
-import com.github.frankfuenmayor.flutterhelper.settings.BuildRunnerBuildKnownAnnotations
+import com.github.frankfuenmayor.flutterhelper.buildrunner.settings.BuildRunnerBuildKnownAnnotations
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.psi.PsiElement

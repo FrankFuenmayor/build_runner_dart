@@ -78,9 +78,9 @@ class BuildRunnerBuild(
 private fun Project.getConsoleView(): ConsoleView? {
     val toolWindow =
         ToolWindowManager.getInstance(this)
-            .getToolWindow("Build Runner")
+            .getToolWindow("dart_build_runner")
 
-    toolWindow?.title = "Dart Build Runner Output"
+    toolWindow?.title = "build_runner"
     toolWindow?.show()
     return toolWindow
         ?.contentManager

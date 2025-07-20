@@ -1,4 +1,4 @@
-package com.github.frankfuenmayor.flutterhelper.codeInsight
+package com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight
 
 import com.github.frankfuenmayor.flutterhelper.buildrunner.action.BuildRunnerBuild
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
@@ -46,6 +46,5 @@ class RunBuilderRunnerNavigationHandler(
         psiElement.setRunning(false)
         val project = psiElement.project
         DaemonCodeAnalyzer.getInstance(project).restart(psiElement.containingFile)
-
     }
 }

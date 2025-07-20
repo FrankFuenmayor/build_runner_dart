@@ -1,7 +1,7 @@
-package com.github.frankfuenmayor.flutterhelper.codeInsight
+package com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight
 
 import com.github.frankfuenmayor.flutterhelper.buildrunner.Icons
-import com.github.frankfuenmayor.flutterhelper.codeInsight.RunBuilderRunnerNavigationHandler.Companion.isRunning
+import com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight.RunBuilderRunnerNavigationHandler.Companion.isRunning
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.icons.AllIcons.Actions.Execute
@@ -18,7 +18,7 @@ class BuildRunnerLineMarkerInfo(
     psiElement,
     psiElement.textRange,
     icon,
-    { "Run build_runner build" },
+    { "Run build_runner" },
     navigationHandler,
     GutterIconRenderer.Alignment.LEFT,
     { "" }

@@ -1,4 +1,4 @@
-package com.github.frankfuenmayor.flutterhelper.settings
+package com.github.frankfuenmayor.flutterhelper.buildrunner.settings
 
 import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerAnnotation
 import com.intellij.openapi.application.ApplicationManager

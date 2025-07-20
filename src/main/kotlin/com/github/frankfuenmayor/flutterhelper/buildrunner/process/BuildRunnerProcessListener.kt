@@ -1,6 +1,6 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner.process
 
-import com.github.frankfuenmayor.flutterhelper.ui.SUCCESS_OUTPUT
+import com.github.frankfuenmayor.flutterhelper.buildrunner.ui.SUCCESS_OUTPUT
 import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.process.ProcessOutputTypes

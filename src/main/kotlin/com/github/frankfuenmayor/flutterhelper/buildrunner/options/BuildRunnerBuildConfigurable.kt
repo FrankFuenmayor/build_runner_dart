@@ -2,7 +2,7 @@ package com.github.frankfuenmayor.flutterhelper.buildrunner.options
 
 import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerAnnotation
 import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerAnnotation.Companion.builtIns
-import com.github.frankfuenmayor.flutterhelper.settings.SettingsService
+import com.github.frankfuenmayor.flutterhelper.buildrunner.settings.SettingsService
 import com.intellij.openapi.options.Configurable
 import com.intellij.ui.AnActionButton
 import com.intellij.ui.ToolbarDecorator
@@ -25,7 +25,7 @@ class BuildRunnerBuildConfigurable : Configurable {
 
     @Nls
     override fun getDisplayName(): String {
-        return "Dart Build Runner Settings"
+        return "build_runner for Dart settings"
     }
 
     override fun createComponent(): JComponent? {
@@ -97,7 +97,7 @@ object AnnotationColumn : ColumnInfo<BuildRunnerAnnotation, String>("Annotation"
     }
 }
 
-object FilePatternsColumn : ColumnInfo<BuildRunnerAnnotation, String>("File Patterns") {
+object FilePatternsColumn : ColumnInfo<BuildRunnerAnnotation, String>("Output File Patterns (Comma separated)") {
     override fun valueOf(item: BuildRunnerAnnotation): String? {
         return item.filePatterns.joinToString(", ")
     }
