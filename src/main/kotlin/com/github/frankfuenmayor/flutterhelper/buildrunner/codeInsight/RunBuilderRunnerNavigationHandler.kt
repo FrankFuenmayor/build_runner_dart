@@ -1,9 +1,12 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight
 
+import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerAnnotation
 import com.github.frankfuenmayor.flutterhelper.buildrunner.action.BuildRunnerBuild
 import com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight.RunBuilderRunnerNavigationHandler.Companion.setRunning
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
@@ -17,6 +20,7 @@ import java.io.File
 typealias FindPubspecYamlContainingFolder = (psiElement: PsiElement) -> File?
 
 class RunBuilderRunnerNavigationHandler(
+    private val buildRunnerAnnotation: BuildRunnerAnnotation,
     private val buildRunnerBuild: BuildRunnerBuild = BuildRunnerBuild(),
     private val createPopupMenu: CreateBuildRunnerPopupMenu = CreateBuildRunnerPopupMenu(),
     private val findPubspecYamlContainingFolder: FindPubspecYamlContainingFolder = ::findPubspecYamlContainingFolder,
@@ -37,14 +41,36 @@ class RunBuilderRunnerNavigationHandler(
 
         val workDirectory = findPubspecYamlContainingFolder(psiElement) ?: return
 
-        createPopupMenu(psiElement) { deleteConflictingOutputs, buildFilter ->
+        createPopupMenu(
+            psiElement = psiElement,
+            buildRunnerAnnotation = buildRunnerAnnotation
+        ) { deleteConflictingOutputs, buildFilter ->
             psiElement.setRunning(true)
             buildRunnerBuild(
                 project = psiElement.project,
                 workDirectory = workDirectory,
                 buildFilter = buildFilter,
                 deleteConflictingOutputs = deleteConflictingOutputs,
-                onBuildEnd = { refreshGutterIcons(psiElement) },
+                onBuildEnd = {
+                    refreshGutterIcons(psiElement)
+
+                    var expectedOutputExist = true
+                    if (buildFilter.isNotEmpty()) {
+                        expectedOutputExist = buildFilter.all { file ->
+                            File(workDirectory, file).exists()
+                        }
+                    }
+
+                    if (!expectedOutputExist) {
+
+                        NotificationGroupManager.getInstance()
+                            .getNotificationGroup("Dart build_runner notification group")
+                            .createNotification("Build finished with error", NotificationType.ERROR)
+                            .notify(psiElement.project);
+
+                    }
+
+                },
             )
         }?.showInScreenCoordinates(e.component, Point(e.xOnScreen, e.yOnScreen))
     }

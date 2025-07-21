@@ -49,3 +49,12 @@ Plugin based on the [IntelliJ Platform Plugin Template][template].
 
 [template]: https://github.com/JetBrains/intellij-platform-plugin-template
 [docs:plugin-description]: https://plugins.jetbrains.com/docs/intellij/plugin-user-experience.html#plugin-description-and-presentation
+
+
+
+TODOS:
+
+- Unificar en un repositorio los settings que use un cache cuando se registra una nueva anotacion
+- validar que los archivos esperados fueron generados
+- validar que build_runner esta como dependencia
+- 

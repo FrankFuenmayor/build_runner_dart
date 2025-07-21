@@ -1,5 +1,6 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight
 
+import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerAnnotation
 import com.github.frankfuenmayor.flutterhelper.buildrunner.settings.BuildRunnerBuildKnownAnnotations
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
@@ -9,10 +10,11 @@ import com.intellij.psi.util.elementType
 import com.jetbrains.lang.dart.DartFileType
 import com.jetbrains.lang.dart.DartTokenTypes
 
+
+typealias GutterIconNavigationHandlerProvider = (annotation: BuildRunnerAnnotation) -> GutterIconNavigationHandler<PsiElement>
+
 class RunBuilderRunnerLineMarkerProvider(
-    private val createNavigationHandler: (PsiElement) -> GutterIconNavigationHandler<PsiElement> = {
-        RunBuilderRunnerNavigationHandler()
-    },
+    private val createNavigationHandler: GutterIconNavigationHandlerProvider = { RunBuilderRunnerNavigationHandler(it) },
     private val knownAnnotations: BuildRunnerBuildKnownAnnotations = BuildRunnerBuildKnownAnnotations()
 ) : LineMarkerProvider {
     override fun getLineMarkerInfo(psiElement: PsiElement): LineMarkerInfo<*>? {
@@ -30,14 +32,12 @@ class RunBuilderRunnerLineMarkerProvider(
 
         val annotationIdentifier = psiElement.nextSibling.text
 
-        if (!knownAnnotations.isKnown(annotationIdentifier)) {
-            return null
-        }
+        val buildRunnerAnnotation =
+            knownAnnotations.findAnnotation(annotationIdentifier) ?: return null
 
         return BuildRunnerLineMarkerInfo(
             psiElement = psiElement,
-            navigationHandler = createNavigationHandler(psiElement),
+            navigationHandler = createNavigationHandler(buildRunnerAnnotation),
         )
     }
 }
-
