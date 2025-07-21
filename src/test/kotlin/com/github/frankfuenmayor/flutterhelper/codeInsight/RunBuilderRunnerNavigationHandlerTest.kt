@@ -3,6 +3,7 @@ package com.github.frankfuenmayor.flutterhelper.codeInsight
 import com.github.frankfuenmayor.flutterhelper.buildrunner.action.BuildRunnerBuild
 import com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight.CreateBuildRunnerPopupMenu
 import com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight.RunBuilderRunnerNavigationHandler
+import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.psi.PsiFile
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.jetbrains.lang.dart.DartFileType
@@ -13,7 +14,7 @@ import org.intellij.lang.annotations.Language
 import java.awt.Component
 import java.awt.Point
 import java.awt.event.MouseEvent
-import javax.swing.JPopupMenu
+import java.io.File
 
 class RunBuilderRunnerNavigationHandlerTest : BasePlatformTestCase() {
 
@@ -24,7 +25,8 @@ class RunBuilderRunnerNavigationHandlerTest : BasePlatformTestCase() {
 
         val navigationHandler = RunBuilderRunnerNavigationHandler(
             buildRunnerBuild = buildRunnerBuild,
-            createPopupMenu = createPopupMenu
+            createPopupMenu = createPopupMenu,
+            findPubspecYamlContainingFolder = { File("package-folder") }
         )
 
         val file = dartFileWithContent(
@@ -35,7 +37,7 @@ class RunBuilderRunnerNavigationHandlerTest : BasePlatformTestCase() {
         )
 
         val annotationElement = file.findElement("@freezed")
-        val popupMenu = mockk<JPopupMenu>(relaxed = true)
+        val popupMenu = mockk<JBPopup>(relaxed = true)
 
         every { createPopupMenu(annotationElement, any()) } returns popupMenu
 
@@ -43,7 +45,7 @@ class RunBuilderRunnerNavigationHandlerTest : BasePlatformTestCase() {
 
         verify {
             createPopupMenu.invoke(annotationElement, any())
-            popupMenu.show(any(), any(), any())
+            popupMenu.showInScreenCoordinates(any(), any())
         }
     }
 
@@ -63,6 +65,8 @@ class RunBuilderRunnerNavigationHandlerTest : BasePlatformTestCase() {
             }
             every { x } returns 1
             every { y } returns 1
+            every { xOnScreen } returns 1
+            every { yOnScreen } returns 1
         }
     }
 

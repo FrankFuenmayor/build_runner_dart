@@ -8,37 +8,21 @@ import com.intellij.execution.process.BaseProcessHandler
 import com.intellij.execution.process.ProcessHandlerFactory
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindowManager
-import com.jetbrains.lang.dart.util.PubspecYamlUtil
-import org.yaml.snakeyaml.Yaml
 import java.io.File
-
-typealias FindPubspecYamlFile = (project: Project, virtualFile: VirtualFile) -> VirtualFile?
 
 class BuildRunnerBuild(
     private val commandLineProvider: BuildRunnerBuildCommandLineProvider = BuildRunnerBuildCommandLineProvider(),
-    private val findPubspecYamlFile: FindPubspecYamlFile = PubspecYamlUtil::findPubspecYamlFile,
-    private val createProcessHandler: (GeneralCommandLine) -> BaseProcessHandler<Process> = {
-        ProcessHandlerFactory.getInstance().createColoredProcessHandler(it)
-    }
+    private val createProcessHandler: (GeneralCommandLine) -> BaseProcessHandler<Process> =
+        ProcessHandlerFactory.getInstance()::createColoredProcessHandler
 ) {
     operator fun invoke(
         project: Project,
-        virtualFile: VirtualFile,
+        workDirectory: File,
         buildFilter: List<String> = emptyList(),
         deleteConflictingOutputs: Boolean = false,
         onBuildEnd: () -> Unit = {}
     ) {
-
-        val yamlFile = findPubspecYamlFile(project, virtualFile) ?: return
-
-        val pubspec = Yaml().loadAs(yamlFile.inputStream, Map::class.java)
-
-        println(pubspec)
-
-        val workDirectory = File(yamlFile.parent.path)
-
         val generalCommandLine =
             commandLineProvider.getCommandLine(
                 project = project,
@@ -61,7 +45,7 @@ class BuildRunnerBuild(
                 runAgain = {
                     invoke(
                         project = project,
-                        virtualFile = virtualFile,
+                        workDirectory = workDirectory,
                         deleteConflictingOutputs = true,
                         onBuildEnd = onBuildEnd
                     )
@@ -73,18 +57,15 @@ class BuildRunnerBuild(
     }
 }
 
-private fun Project.getConsoleView(): ConsoleView? {
-    val toolWindow =
-        ToolWindowManager.getInstance(this)
-            .getToolWindow("dart build_runner")
-
-
-    toolWindow?.show()
-    toolWindow?.setIcon(Icons.Build)
-
-    return toolWindow
-        ?.contentManager
-        ?.contents
-        ?.firstOrNull()
-        ?.component as ConsoleView?
-}
+private fun Project.getConsoleView(): ConsoleView? = ToolWindowManager
+    .getInstance(this)
+    .getToolWindow("dart build_runner")
+    ?.let { toolWindow ->
+        toolWindow.show()
+        toolWindow.setIcon(Icons.Build)
+        toolWindow
+            .contentManager
+            .contents
+            .firstOrNull()
+            ?.component as ConsoleView?
+    }

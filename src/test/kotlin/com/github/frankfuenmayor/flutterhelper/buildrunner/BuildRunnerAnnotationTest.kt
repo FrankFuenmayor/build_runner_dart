@@ -1,5 +1,6 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner
 
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 
@@ -17,6 +18,7 @@ class BuildRunnerAnnotationTest {
             filePatterns = listOf(".dart"),
         )
 
-        assert(buildRunnerAnnotation == buildRunnerAnnotation2)
+        assertEquals(buildRunnerAnnotation, buildRunnerAnnotation2)
+
     }
 }
