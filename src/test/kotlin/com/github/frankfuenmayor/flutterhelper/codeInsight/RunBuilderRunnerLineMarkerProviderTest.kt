@@ -82,9 +82,15 @@ class RunBuilderRunnerLineMarkerProviderTest : BasePlatformTestCase() {
     ///<editor-fold desc="Helper functions">
     private fun newRunBuilderRunnerLineMarkerProvider(
         navigationHandler: GutterIconNavigationHandler<PsiElement> = newGutterIconNavigationHandler()
+
     ) = RunBuilderRunnerLineMarkerProvider(
         createNavigationHandler = { navigationHandler },
-        knownAnnotations = BuildRunnerBuildKnownAnnotations()
+        knownAnnotations = BuildRunnerBuildKnownAnnotations(),
+        buildRunnerDataBuilder = mockk() {
+            every { setPsiElement(any()) } returns this
+            every { setBuildRunnerAnnotation(any()) } returns this
+            every { build() } returns mockk()
+        }
     )
 
     private fun newGutterIconNavigationHandler(): GutterIconNavigationHandler<PsiElement> =

@@ -1,5 +1,6 @@
 package com.github.frankfuenmayor.flutterhelper.codeInsight
 
+import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerData
 import com.github.frankfuenmayor.flutterhelper.buildrunner.action.BuildRunnerBuild
 import com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight.CreateBuildRunnerPopupMenu
 import com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight.RunBuilderRunnerNavigationHandler
@@ -14,7 +15,6 @@ import org.intellij.lang.annotations.Language
 import java.awt.Component
 import java.awt.Point
 import java.awt.event.MouseEvent
-import java.io.File
 
 class RunBuilderRunnerNavigationHandlerTest : BasePlatformTestCase() {
 
@@ -22,11 +22,12 @@ class RunBuilderRunnerNavigationHandlerTest : BasePlatformTestCase() {
         val buildRunnerBuild = mockBuildRunnerBuild()
         val createPopupMenu = mockCreateBuildRunnerPopupMenu()
         val mouseEvent = mockMouseEvent()
+        val buildDRunnerData = mockk<BuildRunnerData>()
 
         val navigationHandler = RunBuilderRunnerNavigationHandler(
+            buildRunnerData = buildDRunnerData,
             buildRunnerBuild = buildRunnerBuild,
-            createPopupMenu = createPopupMenu,
-            findPubspecYamlContainingFolder = { File("package-folder") }
+            createPopupMenu = createPopupMenu
         )
 
         val file = dartFileWithContent(
@@ -39,12 +40,12 @@ class RunBuilderRunnerNavigationHandlerTest : BasePlatformTestCase() {
         val annotationElement = file.findElement("@freezed")
         val popupMenu = mockk<JBPopup>(relaxed = true)
 
-        every { createPopupMenu(annotationElement, any()) } returns popupMenu
+        every { createPopupMenu(buildDRunnerData, any()) } returns popupMenu
 
         navigationHandler.navigate(mouseEvent, annotationElement)
 
         verify {
-            createPopupMenu.invoke(annotationElement, any())
+            createPopupMenu.invoke(buildDRunnerData, any())
             popupMenu.showInScreenCoordinates(any(), any())
         }
     }

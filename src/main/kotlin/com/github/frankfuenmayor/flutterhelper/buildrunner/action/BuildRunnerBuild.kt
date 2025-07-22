@@ -19,7 +19,7 @@ class BuildRunnerBuild(
     operator fun invoke(
         project: Project,
         workDirectory: File,
-        buildFilter: List<String> = emptyList(),
+        outputFiles: List<File> = emptyList(),
         deleteConflictingOutputs: Boolean = false,
         onBuildEnd: () -> Unit = {}
     ) {
@@ -27,7 +27,7 @@ class BuildRunnerBuild(
             commandLineProvider.getCommandLine(
                 project = project,
                 workDirectory = workDirectory,
-                outputFiles = buildFilter,
+                outputFiles = outputFiles,
                 deleteConflictingOutputs = deleteConflictingOutputs
             )
 

@@ -1,6 +1,7 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight
 
-import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerAnnotation
+import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerData
+import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerDataBuilder
 import com.github.frankfuenmayor.flutterhelper.buildrunner.settings.BuildRunnerBuildKnownAnnotations
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
@@ -11,11 +12,14 @@ import com.jetbrains.lang.dart.DartFileType
 import com.jetbrains.lang.dart.DartTokenTypes
 
 
-typealias GutterIconNavigationHandlerProvider = (annotation: BuildRunnerAnnotation) -> GutterIconNavigationHandler<PsiElement>
+typealias GutterIconNavigationHandlerProvider = (buildRunnerData: BuildRunnerData) -> GutterIconNavigationHandler<PsiElement>
 
 class RunBuilderRunnerLineMarkerProvider(
-    private val createNavigationHandler: GutterIconNavigationHandlerProvider = { RunBuilderRunnerNavigationHandler(it) },
-    private val knownAnnotations: BuildRunnerBuildKnownAnnotations = BuildRunnerBuildKnownAnnotations()
+    private val createNavigationHandler: GutterIconNavigationHandlerProvider = {
+        RunBuilderRunnerNavigationHandler(buildRunnerData = it)
+    },
+    private val knownAnnotations: BuildRunnerBuildKnownAnnotations = BuildRunnerBuildKnownAnnotations(),
+    private val buildRunnerDataBuilder: BuildRunnerDataBuilder = BuildRunnerDataBuilder()
 ) : LineMarkerProvider {
     override fun getLineMarkerInfo(psiElement: PsiElement): LineMarkerInfo<*>? {
 
@@ -35,9 +39,14 @@ class RunBuilderRunnerLineMarkerProvider(
         val buildRunnerAnnotation =
             knownAnnotations.findAnnotation(annotationIdentifier) ?: return null
 
+        val data = buildRunnerDataBuilder
+            .setPsiElement(psiElement)
+            .setBuildRunnerAnnotation(buildRunnerAnnotation)
+            .build()
+
         return BuildRunnerLineMarkerInfo(
             psiElement = psiElement,
-            navigationHandler = createNavigationHandler(buildRunnerAnnotation),
+            navigationHandler = createNavigationHandler(data)
         )
     }
 }

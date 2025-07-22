@@ -14,7 +14,7 @@ class BuildRunnerBuildCommandLineProvider(
     fun getCommandLine(
         project: Project,
         workDirectory: File,
-        outputFiles: List<String> = emptyList(),
+        outputFiles: List<File> = emptyList(),
         deleteConflictingOutputs: Boolean = false
     ): GeneralCommandLine {
 
@@ -29,7 +29,7 @@ class BuildRunnerBuildCommandLineProvider(
 
         outputFiles.forEach {
             arguments.add("--build-filter")
-            arguments.add(it)
+            arguments.add(it.absolutePath)
         }
 
         if(deleteConflictingOutputs){

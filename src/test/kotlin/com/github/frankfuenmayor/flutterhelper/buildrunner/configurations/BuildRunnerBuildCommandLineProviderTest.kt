@@ -1,6 +1,8 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner.configurations
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import io.mockk.every
+import io.mockk.mockk
 import java.io.File
 
 
@@ -9,10 +11,17 @@ class BuildRunnerBuildCommandLineProviderTest : BasePlatformTestCase() {
     fun `test - Provide GeneralCommandLine for specific files`() {
         val provider = newBuildRunnerBuildCommandLineProvider(dartExecutablePath)
 
+        val file1 = mockk<File> {
+            every { absolutePath } returns "file1"
+        }
+        val file2 = mockk<File> {
+            every { absolutePath } returns "file2"
+        }
+
         val commandLine = provider.getCommandLine(
             project = project,
             workDirectory = File("/somedir"),
-            outputFiles = listOf("file1", "file2"),
+            outputFiles = listOf(file1, file2),
             deleteConflictingOutputs = false
         )
 
