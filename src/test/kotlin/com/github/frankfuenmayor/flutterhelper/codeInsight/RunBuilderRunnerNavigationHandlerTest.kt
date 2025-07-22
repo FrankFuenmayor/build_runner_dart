@@ -1,9 +1,9 @@
 package com.github.frankfuenmayor.flutterhelper.codeInsight
 
 import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerData
-import com.github.frankfuenmayor.flutterhelper.buildrunner.action.BuildRunnerBuild
 import com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight.CreateBuildRunnerPopupMenu
 import com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight.RunBuilderRunnerNavigationHandler
+import com.github.frankfuenmayor.flutterhelper.buildrunner.configurations.BuildRunnerCommandLine
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.psi.PsiFile
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
@@ -26,7 +26,7 @@ class RunBuilderRunnerNavigationHandlerTest : BasePlatformTestCase() {
 
         val navigationHandler = RunBuilderRunnerNavigationHandler(
             buildRunnerData = buildDRunnerData,
-            buildRunnerBuild = buildRunnerBuild,
+            buildRunnerCommandLine = buildRunnerBuild,
             createPopupMenu = createPopupMenu
         )
 
@@ -50,7 +50,7 @@ class RunBuilderRunnerNavigationHandlerTest : BasePlatformTestCase() {
         }
     }
 
-    private fun mockBuildRunnerBuild() = mockk<BuildRunnerBuild>()
+    private fun mockBuildRunnerBuild() = mockk<BuildRunnerCommandLine>()
 
     private fun mockCreateBuildRunnerPopupMenu(): CreateBuildRunnerPopupMenu {
         val m = mockk<CreateBuildRunnerPopupMenu>()

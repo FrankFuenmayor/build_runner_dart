@@ -20,14 +20,14 @@ class RunBuilderRunnerLineMarkerProviderTest : BasePlatformTestCase() {
 
         val psiFile = dartFileWithContent(
             """                
-            | @freezed
+            | @freezed333
             | void someFunction() {}
             """.trimMargin()
         )
 
         val annotationElement = psiFile.findElement(FREEZED_ANNOTATION)
         val lineMarkerProvider = newRunBuilderRunnerLineMarkerProvider(
-            knownAnnotations = listOf(BuildRunnerAnnotation("freezed"))
+            knownAnnotations = listOf(BuildRunnerAnnotation("freezed333"))
         )
         val expectedLineMarkerInfo =
             lineMarkerProvider.getLineMarkerInfo(annotationElement)
