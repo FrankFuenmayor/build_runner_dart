@@ -8,8 +8,6 @@ import io.mockk.mockk
 import io.mockk.verifyOrder
 
 class BuildRunnerProcessListenerTest : BasePlatformTestCase() {
-
-
     fun `test - print text available`() {
         val consoleView = mockk<ConsoleView>(relaxed = true)
 

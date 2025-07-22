@@ -4,7 +4,7 @@ interface BuildRunnerAnnotations {
 
     fun getAnnotations(): List<BuildRunnerAnnotation>
 
-    fun setAnnotations(annotation: List<BuildRunnerAnnotation>)
+    fun setAnnotations(annotations: List<BuildRunnerAnnotation>)
 
     fun removeAnnotation(annotation: BuildRunnerAnnotation) {
         setAnnotations(getAnnotations() - annotation)

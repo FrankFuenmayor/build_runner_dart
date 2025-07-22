@@ -14,16 +14,17 @@ import com.intellij.openapi.components.Storage
     storages = [Storage("FlutterHelperPluginSettings.xml")]
 )
 @Service(Service.Level.APP)
-class BuildRunnerAnnotationsService : SerializablePersistentStateComponent<List<BuildRunnerAnnotation>>(builtIns),
+class BuildRunnerAnnotationsService :
+    SerializablePersistentStateComponent<BuildRunnerAnnotationsServiceState>(BuildRunnerAnnotationsServiceState()),
     BuildRunnerAnnotations {
 
     override fun getAnnotations(): List<BuildRunnerAnnotation> {
-        return state
+        return state.annotations
     }
 
-    override fun setAnnotations(annotation: List<BuildRunnerAnnotation>) {
+    override fun setAnnotations(annotations: List<BuildRunnerAnnotation>) {
         updateState {
-            annotation
+            state.copy(annotations)
         }
     }
 
@@ -33,3 +34,7 @@ class BuildRunnerAnnotationsService : SerializablePersistentStateComponent<List<
             ApplicationManager.getApplication().getService(BuildRunnerAnnotationsService::class.java)
     }
 }
+
+data class BuildRunnerAnnotationsServiceState(
+    @JvmField val annotations: List<BuildRunnerAnnotation> = builtIns
+)

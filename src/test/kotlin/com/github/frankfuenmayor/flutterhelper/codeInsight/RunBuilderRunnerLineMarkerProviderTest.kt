@@ -97,7 +97,7 @@ class RunBuilderRunnerLineMarkerProviderTest : BasePlatformTestCase() {
                     return knownAnnotations
                 }
 
-                override fun setAnnotations(annotation: List<BuildRunnerAnnotation>) {
+                override fun setAnnotations(annotations: List<BuildRunnerAnnotation>) {
                     TODO("Do not use")
                 }
             },

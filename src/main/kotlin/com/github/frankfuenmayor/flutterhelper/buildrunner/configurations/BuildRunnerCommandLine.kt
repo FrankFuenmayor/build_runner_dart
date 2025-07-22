@@ -1,5 +1,7 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner.configurations
 
+import com.android.tools.idea.run.configuration.execution.println
+import com.android.tools.idea.run.configuration.execution.printlnError
 import com.github.frankfuenmayor.flutterhelper.buildrunner.Icons
 import com.github.frankfuenmayor.flutterhelper.buildrunner.process.BuildRunnerProcessListener
 import com.intellij.execution.configurations.GeneralCommandLine
@@ -68,10 +70,28 @@ class BuildRunnerCommandLine(
                         onBuildEnd = onBuildEnd
                     )
                 },
-                onBuildEnd = onBuildEnd
+                onBuildEnd = {
+
+                    consoleView.println("")
+
+                    var missingOutputFiles = 0
+                    for (file in outputFiles) {
+                        if (!file.exists()) {
+                            missingOutputFiles++
+                            consoleView.printlnError("Output file ${file.name} not generated")
+                        }
+                    }
+
+                    if (missingOutputFiles > 0) {
+                        consoleView.printlnError(
+                            "Check your build_runner configuration"
+                        )
+                    }
+                    onBuildEnd()
+                }
             )
         )
-        
+
         processHandler.startNotify()
     }
 

@@ -29,28 +29,25 @@ class BuildRunnerDataBuilder(
         if (psiElement == null) throw RuntimeException("PsiElement not set")
         if (buildRunnerAnnotation == null) throw RuntimeException("BuildRunnerAnnotation not set")
 
-        val pubspecYamlFile = findPubspecYamlFile(
-            psiElement!!.project,
-            psiElement!!.containingFile.virtualFile
-        )
-
+        val containingFile = psiElement!!.containingFile
+        val pubspecYamlFile = findPubspecYamlFile(psiElement!!.project, containingFile.virtualFile)
         val projectName = pubspecYamlFile?.let { getDartProjectName(it) }
+        val fileFolder = containingFile.virtualFile.parent.path
+        val fileName = containingFile.name.removeSuffix(".dart")
 
-        val folder = pubspecYamlFile?.let { File(it.parent.path) }
-        val fileName = psiElement!!.containingFile.name.removeSuffix(".dart")
-
-        val outputFiles = folder?.let {
+        val outputFiles = fileFolder.let { fileFolder ->
             buildRunnerAnnotation!!.filePatterns.map {
                 val outputFilename = it.replace("*", fileName)
-                Paths.get(it, outputFilename).toFile()
+                Paths.get(fileFolder, outputFilename).toFile()
             }
         }
 
+        val projectFolder = pubspecYamlFile?.let { File(it.parent.path) }
 
         return BuildRunnerData(
-            projectName ?: throw RuntimeException("Project name not found"),
-            folder ?: throw RuntimeException("Project folder not found"),
-            outputFiles ?: throw RuntimeException("Output files not found")
+            dartProjectName = projectName ?: throw RuntimeException("Project name not found"),
+            projectFolder = projectFolder ?: throw RuntimeException("Project folder not found"),
+            outputFiles = outputFiles
         )
     }
 
