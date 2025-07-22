@@ -60,7 +60,7 @@ class RunBuilderRunnerLineMarkerProviderTest : BasePlatformTestCase() {
     fun `test - navigate successfully`() {
         val file = dartFileWithContent(
             """                
-            | @freezed
+            | @freezed222
             | void someFunction() {}
             """.trimMargin()
         )
@@ -69,7 +69,10 @@ class RunBuilderRunnerLineMarkerProviderTest : BasePlatformTestCase() {
             .thatNavigatesSuccessfully()
 
         val lineMarkerProvider =
-            newRunBuilderRunnerLineMarkerProvider(navigationHandler = navigationHandler)
+            newRunBuilderRunnerLineMarkerProvider(
+                navigationHandler = navigationHandler,
+                knownAnnotations = listOf(BuildRunnerAnnotation("freezed222"))
+            )
 
         val annotationElement = file.findElement(FREEZED_ANNOTATION)
 
@@ -86,20 +89,25 @@ class RunBuilderRunnerLineMarkerProviderTest : BasePlatformTestCase() {
     private fun newRunBuilderRunnerLineMarkerProvider(
         navigationHandler: GutterIconNavigationHandler<PsiElement> = newGutterIconNavigationHandler(),
         knownAnnotations: List<BuildRunnerAnnotation> = emptyList()
-    ) = RunBuilderRunnerLineMarkerProvider(
-        createNavigationHandler = { navigationHandler },
-        buildRunnerAnnotations = object : BuildRunnerAnnotations {
-            override fun getAnnotations(): List<BuildRunnerAnnotation> = knownAnnotations
-            override fun setAnnotations(annotation: List<BuildRunnerAnnotation>) {
-                TODO("Do not use")
+    ): RunBuilderRunnerLineMarkerProvider {
+        return RunBuilderRunnerLineMarkerProvider(
+            createNavigationHandler = { navigationHandler },
+            buildRunnerAnnotations = object : BuildRunnerAnnotations {
+                override fun getAnnotations(): List<BuildRunnerAnnotation> {
+                    return knownAnnotations
+                }
+
+                override fun setAnnotations(annotation: List<BuildRunnerAnnotation>) {
+                    TODO("Do not use")
+                }
+            },
+            buildRunnerDataBuilder = mockk() {
+                every { setPsiElement(any()) } returns this
+                every { setBuildRunnerAnnotation(any()) } returns this
+                every { build() } returns mockk()
             }
-        },
-        buildRunnerDataBuilder = mockk() {
-            every { setPsiElement(any()) } returns this
-            every { setBuildRunnerAnnotation(any()) } returns this
-            every { build() } returns mockk()
-        }
-    )
+        )
+    }
 
     private fun newGutterIconNavigationHandler(): GutterIconNavigationHandler<PsiElement> =
         mockk<GutterIconNavigationHandler<PsiElement>>()
