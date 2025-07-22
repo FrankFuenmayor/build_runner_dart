@@ -1,7 +1,8 @@
 package com.github.frankfuenmayor.flutterhelper.codeInsight
 
+import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerAnnotation
+import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerAnnotations
 import com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight.RunBuilderRunnerLineMarkerProvider
-import com.github.frankfuenmayor.flutterhelper.buildrunner.settings.BuildRunnerBuildKnownAnnotations
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.psi.PsiElement
@@ -25,7 +26,9 @@ class RunBuilderRunnerLineMarkerProviderTest : BasePlatformTestCase() {
         )
 
         val annotationElement = psiFile.findElement(FREEZED_ANNOTATION)
-        val lineMarkerProvider = newRunBuilderRunnerLineMarkerProvider()
+        val lineMarkerProvider = newRunBuilderRunnerLineMarkerProvider(
+            knownAnnotations = listOf(BuildRunnerAnnotation("freezed"))
+        )
         val expectedLineMarkerInfo =
             lineMarkerProvider.getLineMarkerInfo(annotationElement)
 
@@ -81,11 +84,16 @@ class RunBuilderRunnerLineMarkerProviderTest : BasePlatformTestCase() {
 
     ///<editor-fold desc="Helper functions">
     private fun newRunBuilderRunnerLineMarkerProvider(
-        navigationHandler: GutterIconNavigationHandler<PsiElement> = newGutterIconNavigationHandler()
-
+        navigationHandler: GutterIconNavigationHandler<PsiElement> = newGutterIconNavigationHandler(),
+        knownAnnotations: List<BuildRunnerAnnotation> = emptyList()
     ) = RunBuilderRunnerLineMarkerProvider(
         createNavigationHandler = { navigationHandler },
-        knownAnnotations = BuildRunnerBuildKnownAnnotations(),
+        buildRunnerAnnotations = object : BuildRunnerAnnotations {
+            override fun getAnnotations(): List<BuildRunnerAnnotation> = knownAnnotations
+            override fun setAnnotations(annotation: List<BuildRunnerAnnotation>) {
+                TODO("Do not use")
+            }
+        },
         buildRunnerDataBuilder = mockk() {
             every { setPsiElement(any()) } returns this
             every { setBuildRunnerAnnotation(any()) } returns this

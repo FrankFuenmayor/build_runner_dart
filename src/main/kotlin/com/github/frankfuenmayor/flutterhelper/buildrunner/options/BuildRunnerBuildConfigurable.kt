@@ -2,7 +2,7 @@ package com.github.frankfuenmayor.flutterhelper.buildrunner.options
 
 import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerAnnotation
 import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerAnnotation.Companion.builtIns
-import com.github.frankfuenmayor.flutterhelper.buildrunner.settings.SettingsService
+import com.github.frankfuenmayor.flutterhelper.buildrunner.settings.BuildRunnerAnnotationsService
 import com.intellij.openapi.options.Configurable
 import com.intellij.ui.AnActionButton
 import com.intellij.ui.ToolbarDecorator
@@ -13,7 +13,9 @@ import org.jetbrains.annotations.Nls
 import javax.swing.JComponent
 import javax.swing.event.TableModelEvent
 
-class BuildRunnerBuildConfigurable : Configurable {
+class BuildRunnerBuildConfigurable(
+    private val buildRunnerAnnotationsService: BuildRunnerAnnotationsService = BuildRunnerAnnotationsService.getInstance()
+) : Configurable {
     private var isModified = false
     private lateinit var currentAnnotations: List<BuildRunnerAnnotation>
     private lateinit var tableView: TableView<BuildRunnerAnnotation>
@@ -30,7 +32,7 @@ class BuildRunnerBuildConfigurable : Configurable {
 
     override fun createComponent(): JComponent? {
 
-        currentAnnotations = SettingsService.getInstance().annotations
+        currentAnnotations = BuildRunnerAnnotationsService.getInstance().getAnnotations()
         model.addRows(currentAnnotations.toMutableList())
         tableView = TableView(model)
 
@@ -64,9 +66,8 @@ class BuildRunnerBuildConfigurable : Configurable {
     override fun isModified(): Boolean = isModified
 
     override fun apply() {
-        SettingsService
-            .getInstance()
-            .annotations = model.items.filter { it.isValid }
+        val updated = model.items.filter { it.isValid }
+        buildRunnerAnnotationsService.setAnnotations(updated)
         currentAnnotations = model.items.toList()
         isModified = false
     }

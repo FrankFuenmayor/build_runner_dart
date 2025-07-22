@@ -1,8 +1,9 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight
 
+import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerAnnotations
 import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerData
 import com.github.frankfuenmayor.flutterhelper.buildrunner.BuildRunnerDataBuilder
-import com.github.frankfuenmayor.flutterhelper.buildrunner.settings.BuildRunnerBuildKnownAnnotations
+import com.github.frankfuenmayor.flutterhelper.buildrunner.settings.BuildRunnerAnnotationsService
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
@@ -18,13 +19,13 @@ class RunBuilderRunnerLineMarkerProvider(
     private val createNavigationHandler: GutterIconNavigationHandlerProvider = {
         RunBuilderRunnerNavigationHandler(buildRunnerData = it)
     },
-    private val knownAnnotations: BuildRunnerBuildKnownAnnotations = BuildRunnerBuildKnownAnnotations(),
+    private val buildRunnerAnnotations: BuildRunnerAnnotations = BuildRunnerAnnotationsService.getInstance(),
     private val buildRunnerDataBuilder: BuildRunnerDataBuilder = BuildRunnerDataBuilder()
 ) : LineMarkerProvider {
     override fun getLineMarkerInfo(psiElement: PsiElement): LineMarkerInfo<*>? {
 
         val isDartFile =
-            psiElement.containingFile.virtualFile.fileType == DartFileType.INSTANCE;
+            psiElement.containingFile.virtualFile.fileType == DartFileType.INSTANCE
 
         if (!isDartFile) {
             return null
@@ -37,7 +38,7 @@ class RunBuilderRunnerLineMarkerProvider(
         val annotationIdentifier = psiElement.nextSibling.text
 
         val buildRunnerAnnotation =
-            knownAnnotations.findAnnotation(annotationIdentifier) ?: return null
+            buildRunnerAnnotations.findAnnotation(annotationIdentifier) ?: return null
 
         val data = buildRunnerDataBuilder
             .setPsiElement(psiElement)
