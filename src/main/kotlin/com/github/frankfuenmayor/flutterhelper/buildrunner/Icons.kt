@@ -15,4 +15,7 @@ object Icons {
     val Build: Icon = IconLoader.getIcon("/icons/build.svg", Icons::class.java)
     @JvmField
     val Dart: Icon = IconLoader.getIcon("/icons/dart.svg", Icons::class.java)
+
+    @JvmField
+    val Stop: Icon = IconLoader.getIcon("/icons/stop.svg", Icons::class.java)
 }
