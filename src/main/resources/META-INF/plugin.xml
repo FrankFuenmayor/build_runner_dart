@@ -1,35 +1,39 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.frankfuenmayor.flutterhelper</id>
+    <id>com.github.frankfuenmayor.dart</id>
     <!--suppress PluginXmlCapitalization -->
     <name>build_runner for Dart</name>
-    <vendor>frankfuenmayor</vendor>
+    <vendor>Frank Fuenmayor</vendor>
+    <description>
+        <![CDATA[
+        <p>Support for running build_runner for Dart.</p>
+        <br>
+        <p>This plugin provides gutter icons for running build_runner for Dart.</p>
+        ]]>
+    </description>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>Dart</depends>
-<!--    <depends>io.flutter</depends>-->
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
         <codeInsight.lineMarkerProvider
-                implementationClass="com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight.RunBuilderRunnerLineMarkerProvider"
+                implementationClass="com.github.frankfuenmayor.dart.buildrunner.codeInsight.RunBuilderRunnerLineMarkerProvider"
                 language="Dart"/>
 
         <!--suppress PluginXmlI18n, PluginXmlCapitalization -->
         <applicationConfigurable
                 displayName="build_runner for Dart"
-                instance="com.github.frankfuenmayor.flutterhelper.buildrunner.options.BuildRunnerBuildConfigurable"/>
+                instance="com.github.frankfuenmayor.dart.buildrunner.options.BuildRunnerBuildConfigurable"/>
 
         <toolWindow id="dart build_runner"
                     anchor="bottom"
-                    factoryClass="com.github.frankfuenmayor.flutterhelper.buildrunner.ui.DartBuildRunnerOutputWindow"/>
+                    factoryClass="com.github.frankfuenmayor.dart.buildrunner.ui.DartBuildRunnerOutputWindow"/>
 
         <notificationGroup id="Dart build_runner notification group"
                            displayType="BALLOON"
                            bundle="messages.MyBundle"
                            key="notification.group.dart.build_runner.notification.group"/>
-
-        <!--        https://chatgpt.com/share/67aace7d-ad40-800b-99a5-b30988500854-->
     </extensions>
 </idea-plugin>
