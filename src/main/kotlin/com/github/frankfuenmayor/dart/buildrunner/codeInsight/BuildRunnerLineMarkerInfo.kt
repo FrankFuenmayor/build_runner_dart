@@ -1,7 +1,6 @@
 package com.github.frankfuenmayor.dart.buildrunner.codeInsight
 
 import com.github.frankfuenmayor.dart.buildrunner.Icons
-import com.github.frankfuenmayor.dart.buildrunner.codeInsight.RunBuilderRunnerNavigationHandler.Companion.isRunning
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.openapi.editor.markup.GutterIconRenderer
@@ -20,11 +19,4 @@ class BuildRunnerLineMarkerInfo(
     navigationHandler,
     GutterIconRenderer.Alignment.LEFT,
     { "" }
-) {
-
-    override fun createGutterRenderer(): GutterIconRenderer = object : LineMarkerGutterIconRenderer<PsiElement>(this) {
-        override fun getIcon(): Icon {
-            return if (this.lineMarkerInfo.element?.isRunning == true) Icons.Stop else Icons.Build
-        }
-    }
-}
+)

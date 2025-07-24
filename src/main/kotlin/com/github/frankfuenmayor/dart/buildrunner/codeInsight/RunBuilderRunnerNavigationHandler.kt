@@ -5,7 +5,6 @@ import com.github.frankfuenmayor.dart.buildrunner.configurations.BuildRunnerComm
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
 import com.jetbrains.lang.dart.DartTokenTypes
@@ -21,13 +20,6 @@ class RunBuilderRunnerNavigationHandler(
 ) : GutterIconNavigationHandler<PsiElement> {
 
     companion object {
-        @JvmStatic
-        private var isRunningKey = Key.create<Boolean>("build_runner.isRunning")
-
-        val PsiElement.isRunning: Boolean get() = getUserData(isRunningKey) ?: false
-
-        fun PsiElement.setRunning(value: Boolean) = putUserData(isRunningKey, value)
-
         private fun refreshGutterIcons(psiElement: PsiElement) {
             val project = psiElement.project
             ApplicationManager.getApplication().invokeLater {
@@ -51,16 +43,12 @@ class RunBuilderRunnerNavigationHandler(
         outputFiles: List<File>,
         deleteConflictingOutputs: Boolean
     ) {
-        psiElement.setRunning(true)
         buildRunnerCommandLine.runCommandLine(
             project = psiElement.project,
             workDirectory = buildRunnerData.projectFolder,
             outputFiles = outputFiles,
             deleteConflictingOutputs = deleteConflictingOutputs,
-            onBuildEnd = {
-                psiElement.setRunning(false)
-                refreshGutterIcons(psiElement)
-            },
+            onBuildEnd = { refreshGutterIcons(psiElement) },
         )
     }
 }
