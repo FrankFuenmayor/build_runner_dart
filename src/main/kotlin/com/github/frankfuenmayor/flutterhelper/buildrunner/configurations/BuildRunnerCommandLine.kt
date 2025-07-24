@@ -1,18 +1,16 @@
 package com.github.frankfuenmayor.flutterhelper.buildrunner.configurations
 
-import com.android.tools.idea.run.configuration.execution.println
-import com.android.tools.idea.run.configuration.execution.printlnError
 import com.github.frankfuenmayor.flutterhelper.buildrunner.Icons
 import com.github.frankfuenmayor.flutterhelper.buildrunner.process.BuildRunnerProcessListener
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.BaseProcessHandler
 import com.intellij.execution.process.ProcessHandlerFactory
 import com.intellij.execution.ui.ConsoleView
+import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindowManager
+import com.jetbrains.lang.dart.sdk.DartSdk
 import com.jetbrains.lang.dart.sdk.DartSdkUtil
-import io.flutter.dart.DartPlugin
-import io.flutter.sdk.FlutterSdk
 import java.io.File
 
 class BuildRunnerCommandLine(
@@ -96,11 +94,9 @@ class BuildRunnerCommandLine(
     }
 
     companion object {
-        private fun getDartExePath(project: Project): String {
-            val dartSdkPath = DartPlugin.getDartSdk(project)?.homePath
-                ?: FlutterSdk.getFlutterSdk(project)?.dartSdkPath ?: return ""
-            return DartSdkUtil.getDartExePath(dartSdkPath)
-        }
+        private fun getDartExePath(project: Project): String = DartSdk.getDartSdk(project)?.let {
+            DartSdkUtil.getDartExePath(it)
+        } ?: throw RuntimeException("Dart SDK not found")
 
         private fun getBuildRunnerConsoleView(project: Project): ConsoleView? = ToolWindowManager
             .getInstance(project)
@@ -115,5 +111,13 @@ class BuildRunnerCommandLine(
                     ?.component as ConsoleView?
             }
     }
+}
+
+private fun ConsoleView.printlnError(string: String) {
+    print(string + "\n", ConsoleViewContentType.ERROR_OUTPUT)
+}
+
+private fun ConsoleView.println(string: String) {
+    print(string + "\n", ConsoleViewContentType.NORMAL_OUTPUT)
 }
 

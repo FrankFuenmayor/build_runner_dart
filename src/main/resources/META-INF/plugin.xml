@@ -1,12 +1,13 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.frankfuenmayor.flutterhelper</id>
+    <!--suppress PluginXmlCapitalization -->
     <name>build_runner for Dart</name>
     <vendor>frankfuenmayor</vendor>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>Dart</depends>
-    <depends>io.flutter</depends>
+<!--    <depends>io.flutter</depends>-->
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
@@ -15,8 +16,9 @@
                 implementationClass="com.github.frankfuenmayor.flutterhelper.buildrunner.codeInsight.RunBuilderRunnerLineMarkerProvider"
                 language="Dart"/>
 
+        <!--suppress PluginXmlI18n, PluginXmlCapitalization -->
         <applicationConfigurable
-                displayName="build_runner for Dart settings"
+                displayName="build_runner for Dart"
                 instance="com.github.frankfuenmayor.flutterhelper.buildrunner.options.BuildRunnerBuildConfigurable"/>
 
         <toolWindow id="dart build_runner"
