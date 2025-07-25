@@ -27,9 +27,11 @@
                 displayName="build_runner for Dart"
                 instance="com.github.frankfuenmayor.dart.buildrunner.options.BuildRunnerBuildConfigurable"/>
 
-        <toolWindow id="dart build_runner"
+        <toolWindow id="build_runner"
                     anchor="bottom"
-                    factoryClass="com.github.frankfuenmayor.dart.buildrunner.ui.DartBuildRunnerOutputWindow"/>
+                    factoryClass="com.github.frankfuenmayor.dart.buildrunner.ui.DartBuildRunnerOutputWindow"
+                    doNotActivateOnStart="true"
+        />
 
         <notificationGroup id="Dart build_runner notification group"
                            displayType="BALLOON"

@@ -1,14 +1,16 @@
 package com.github.frankfuenmayor.dart.buildrunner.configurations
 
-import com.github.frankfuenmayor.dart.buildrunner.Icons
 import com.github.frankfuenmayor.dart.buildrunner.process.BuildRunnerProcessListener
+import com.github.frankfuenmayor.dart.buildrunner.ui.DartBuildRunnerOutputWindow.Companion.DART_BUILD_RUNNER_TOOL_WINDOW_ID
 import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.execution.process.BaseProcessHandler
 import com.intellij.execution.process.ProcessHandlerFactory
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindowManager
+import com.intellij.ui.content.ContentFactory
 import com.jetbrains.lang.dart.sdk.DartSdk
 import com.jetbrains.lang.dart.sdk.DartSdkUtil
 import java.io.File
@@ -17,10 +19,11 @@ class BuildRunnerCommandLine(
     val resolveDartExePath: (Project) -> String = ::getDartExePath,
     private val createProcessHandler: (GeneralCommandLine) -> BaseProcessHandler<Process> =
         ProcessHandlerFactory.getInstance()::createColoredProcessHandler,
-    private val getBuildRunnerConsoleView: (Project) -> ConsoleView? = ::getBuildRunnerConsoleView
+    private val getBuildRunnerConsoleView: (Project, dartProjectName: String) -> ConsoleView? = ::getBuildRunnerConsoleView
 ) {
 
     fun runCommandLine(
+        dartProjectName: String,
         project: Project,
         workDirectory: File,
         outputFiles: List<File> = emptyList(),
@@ -52,7 +55,7 @@ class BuildRunnerCommandLine(
         }
 
         val processHandler: BaseProcessHandler<Process> = createProcessHandler(generalCommandLine)
-        val consoleView = getBuildRunnerConsoleView(project)
+        val consoleView = getBuildRunnerConsoleView(project, dartProjectName)
             ?: throw RuntimeException("Console view not found")
 
         consoleView.clear()
@@ -62,6 +65,7 @@ class BuildRunnerCommandLine(
                 consoleView = consoleView,
                 runAgain = {
                     runCommandLine(
+                        dartProjectName = dartProjectName,
                         project = project,
                         workDirectory = workDirectory,
                         deleteConflictingOutputs = true,
@@ -98,20 +102,32 @@ class BuildRunnerCommandLine(
             DartSdkUtil.getDartExePath(it)
         } ?: throw RuntimeException("Dart SDK not found")
 
-        private fun getBuildRunnerConsoleView(project: Project): ConsoleView? = ToolWindowManager
-            .getInstance(project)
-            .getToolWindow("dart build_runner")
-            ?.let { toolWindow ->
-                toolWindow.show()
-                toolWindow.setIcon(Icons.Build)
-                toolWindow
-                    .contentManager
-                    .contents
-                    .firstOrNull()
-                    ?.component as ConsoleView?
+        private fun getBuildRunnerConsoleView(project: Project, dartProjectName: String): ConsoleView? {
+            val toolWindow = ToolWindowManager
+                .getInstance(project)
+                .getToolWindow(DART_BUILD_RUNNER_TOOL_WINDOW_ID) ?: return null
+
+            toolWindow.activate {}
+
+            val contentManager = toolWindow.contentManager
+            val displayName = "running build_runner for $dartProjectName"
+            var content = contentManager.contents.firstOrNull { it.displayName == displayName }
+
+            if (content == null) {
+                content = ContentFactory.getInstance().createContent(
+                    ConsoleViewImpl(project, true).component,
+                    displayName,
+                    false
+                )
+                contentManager.addContent(content)
             }
+
+            contentManager.setSelectedContent(content)
+            return content.component as ConsoleView
+        }
     }
 }
+
 
 private fun ConsoleView.printlnError(string: String) {
     print(string + "\n", ConsoleViewContentType.ERROR_OUTPUT)
