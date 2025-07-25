@@ -44,6 +44,7 @@ class RunBuilderRunnerNavigationHandler(
         deleteConflictingOutputs: Boolean
     ) {
         buildRunnerCommandLine.runCommandLine(
+            filename = psiElement.containingFile.name,
             dartProjectName = buildRunnerData.dartProjectName,
             project = psiElement.project,
             workDirectory = buildRunnerData.projectFolder,

@@ -1,6 +1,6 @@
 package com.github.frankfuenmayor.dart.buildrunner.ui
 
-import com.github.frankfuenmayor.dart.buildrunner.Icons
+import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerIcons
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
@@ -14,6 +14,6 @@ class DartBuildRunnerOutputWindow : ToolWindowFactory, DumbAware {
     }
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        toolWindow.setIcon(Icons.Build)
+        toolWindow.setIcon(BuildRunnerIcons.Build)
     }
 }

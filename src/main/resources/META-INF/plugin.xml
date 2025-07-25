@@ -17,6 +17,8 @@
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
+
+
     <extensions defaultExtensionNs="com.intellij">
         <codeInsight.lineMarkerProvider
                 implementationClass="com.github.frankfuenmayor.dart.buildrunner.codeInsight.RunBuilderRunnerLineMarkerProvider"
@@ -31,6 +33,8 @@
                     anchor="bottom"
                     factoryClass="com.github.frankfuenmayor.dart.buildrunner.ui.DartBuildRunnerOutputWindow"
                     doNotActivateOnStart="true"
+                    canCloseContents="true"
+                    icon="com.github.frankfuenmayor.dart.buildrunner.BuildRunnerIcons.Build"
         />
 
         <notificationGroup id="Dart build_runner notification group"

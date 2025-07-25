@@ -19,10 +19,11 @@ class BuildRunnerCommandLine(
     val resolveDartExePath: (Project) -> String = ::getDartExePath,
     private val createProcessHandler: (GeneralCommandLine) -> BaseProcessHandler<Process> =
         ProcessHandlerFactory.getInstance()::createColoredProcessHandler,
-    private val getBuildRunnerConsoleView: (Project, dartProjectName: String) -> ConsoleView? = ::getBuildRunnerConsoleView
+    private val getBuildRunnerConsoleView: (Project, dartProjectName: String, filename: String) -> ConsoleView? = ::getBuildRunnerConsoleView
 ) {
 
     fun runCommandLine(
+        filename: String,
         dartProjectName: String,
         project: Project,
         workDirectory: File,
@@ -55,7 +56,7 @@ class BuildRunnerCommandLine(
         }
 
         val processHandler: BaseProcessHandler<Process> = createProcessHandler(generalCommandLine)
-        val consoleView = getBuildRunnerConsoleView(project, dartProjectName)
+        val consoleView = getBuildRunnerConsoleView(project, dartProjectName, filename)
             ?: throw RuntimeException("Console view not found")
 
         consoleView.clear()
@@ -65,6 +66,7 @@ class BuildRunnerCommandLine(
                 consoleView = consoleView,
                 runAgain = {
                     runCommandLine(
+                        filename = filename,
                         dartProjectName = dartProjectName,
                         project = project,
                         workDirectory = workDirectory,
@@ -102,7 +104,7 @@ class BuildRunnerCommandLine(
             DartSdkUtil.getDartExePath(it)
         } ?: throw RuntimeException("Dart SDK not found")
 
-        private fun getBuildRunnerConsoleView(project: Project, dartProjectName: String): ConsoleView? {
+        private fun getBuildRunnerConsoleView(project: Project, dartProjectName: String, filename: String): ConsoleView? {
             val toolWindow = ToolWindowManager
                 .getInstance(project)
                 .getToolWindow(DART_BUILD_RUNNER_TOOL_WINDOW_ID) ?: return null
@@ -110,7 +112,7 @@ class BuildRunnerCommandLine(
             toolWindow.activate {}
 
             val contentManager = toolWindow.contentManager
-            val displayName = "running build_runner for $dartProjectName"
+            val displayName = "$filename [$dartProjectName]"
             var content = contentManager.contents.firstOrNull { it.displayName == displayName }
 
             if (content == null) {
