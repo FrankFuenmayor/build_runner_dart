@@ -1,5 +1,7 @@
 package com.github.frankfuenmayor.dart.buildrunner.configurations
 
+import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerAnnotation
+import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerData
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.BaseProcessHandler
 import com.intellij.execution.ui.ConsoleView
@@ -16,7 +18,7 @@ class BuildRunnerCommandLineTest : BasePlatformTestCase() {
         val processHandler = mockk<BaseProcessHandler<Process>>(relaxed = true)
         val consoleView = mockk<ConsoleView>(relaxed = true)
 
-        lateinit var commandLine : GeneralCommandLine
+        lateinit var commandLine: GeneralCommandLine
 
         val buildRunner = newBuildRunnerBuildCommandLineProvider(
             dartExecutablePath,
@@ -24,7 +26,7 @@ class BuildRunnerCommandLineTest : BasePlatformTestCase() {
                 commandLine = it
                 processHandler
             },
-            getBuildRunnerConsoleView = { consoleView }
+            getBuildRunnerConsoleView = { a, b, c -> consoleView }
         )
 
         val file1 = mockk<File> {
@@ -35,9 +37,14 @@ class BuildRunnerCommandLineTest : BasePlatformTestCase() {
         }
 
         buildRunner.runCommandLine(
-            project = project,
-            workDirectory = File("/somedir"),
-            outputFiles = listOf(file1, file2),
+            buildRunnerData = BuildRunnerData(
+                annotation = BuildRunnerAnnotation("freezed"),
+                dartProjectName = "my_project",
+                filename = "my_file",
+                outputFiles = listOf(file1, file2),
+                project = project,
+                projectFolder = File("/somedir"),
+            ),
             deleteConflictingOutputs = false
         )
 
@@ -53,7 +60,7 @@ class BuildRunnerCommandLineTest : BasePlatformTestCase() {
         val processHandler = mockk<BaseProcessHandler<Process>>(relaxed = true)
         val consoleView = mockk<ConsoleView>(relaxed = true)
 
-        lateinit var commandLine : GeneralCommandLine
+        lateinit var commandLine: GeneralCommandLine
 
         val buildRunner = newBuildRunnerBuildCommandLineProvider(
             dartExecutablePath,
@@ -61,12 +68,18 @@ class BuildRunnerCommandLineTest : BasePlatformTestCase() {
                 commandLine = it
                 processHandler
             },
-            getBuildRunnerConsoleView = { consoleView }
+            getBuildRunnerConsoleView = { a, b, c -> consoleView }
         )
 
         buildRunner.runCommandLine(
-            project = project,
-            workDirectory = File("/somedir"),
+            buildRunnerData = BuildRunnerData(
+                annotation = BuildRunnerAnnotation("freezed"),
+                dartProjectName = "my_project",
+                filename = "my_file",
+                outputFiles = emptyList(),
+                project = project,
+                projectFolder = File("/somedir"),
+            ),
             deleteConflictingOutputs = true
         )
 
@@ -81,7 +94,7 @@ class BuildRunnerCommandLineTest : BasePlatformTestCase() {
     private fun newBuildRunnerBuildCommandLineProvider(
         dartExecPath: String,
         createProcessHandler: (GeneralCommandLine) -> BaseProcessHandler<Process> = { mockk() },
-        getBuildRunnerConsoleView: (Project) -> ConsoleView? = { mockk() }
+        getBuildRunnerConsoleView: (Project, dartProjectName: String, filename: String) -> ConsoleView? = { a, b, c -> mockk() }
     ): BuildRunnerCommandLine {
         return BuildRunnerCommandLine(
             resolveDartExePath = { dartExecPath },

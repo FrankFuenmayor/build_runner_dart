@@ -10,7 +10,6 @@ import com.intellij.psi.util.elementType
 import com.jetbrains.lang.dart.DartTokenTypes
 import java.awt.Point
 import java.awt.event.MouseEvent
-import java.io.File
 
 class RunBuilderRunnerNavigationHandler(
     private val buildRunnerData: BuildRunnerData,
@@ -34,21 +33,16 @@ class RunBuilderRunnerNavigationHandler(
         assert(psiElement.elementType == DartTokenTypes.AT)
 
         createPopupMenu(buildRunnerData) { deleteConflictingOutputs, outputFiles ->
-            onBuildOptionSelected(psiElement, outputFiles, deleteConflictingOutputs)
+            onBuildOptionSelected(psiElement, deleteConflictingOutputs)
         }.showInScreenCoordinates(e.component, Point(e.xOnScreen, e.yOnScreen))
     }
 
     private fun onBuildOptionSelected(
         psiElement: PsiElement,
-        outputFiles: List<File>,
         deleteConflictingOutputs: Boolean
     ) {
         buildRunnerCommandLine.runCommandLine(
-            filename = psiElement.containingFile.name,
-            dartProjectName = buildRunnerData.dartProjectName,
-            project = psiElement.project,
-            workDirectory = buildRunnerData.projectFolder,
-            outputFiles = outputFiles,
+            buildRunnerData = buildRunnerData,
             deleteConflictingOutputs = deleteConflictingOutputs,
             onBuildEnd = { refreshGutterIcons(psiElement) },
         )

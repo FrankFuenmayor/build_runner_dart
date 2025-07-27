@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.jetbrains.lang.dart.util.PubspecYamlUtil
+import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.nio.file.Paths
 
@@ -44,17 +45,41 @@ class BuildRunnerDataBuilder(
 
         val projectFolder = pubspecYamlFile?.let { File(it.parent.path) }
 
+
+        val pubspecYaml = Yaml().loadAs(pubspecYamlFile?.inputStream, Map::class.java)
+
+        @Suppress("UNCHECKED_CAST")
+        val devDependencies = pubspecYaml["dev_dependencies"] as? Map<String, String>
+
+        val missingBuildRunnerDependency = devDependencies?.containsKey("build_runner") == false
+
+        println("pubspecYaml: $pubspecYaml")
+
         return BuildRunnerData(
+            filename = psiElement!!.containingFile.virtualFile.name,
             dartProjectName = projectName ?: throw RuntimeException("Project name not found"),
             projectFolder = projectFolder ?: throw RuntimeException("Project folder not found"),
-            outputFiles = outputFiles
+            outputFiles = outputFiles,
+            annotation = buildRunnerAnnotation!!,
+            project = psiElement!!.project,
+            missingBuildRunnerDependency = missingBuildRunnerDependency
         )
     }
-
 }
 
 data class BuildRunnerData(
+    val annotation: BuildRunnerAnnotation,
     val dartProjectName: String,
+    val filename: String,
+    val outputFiles: List<File>,
+    val project: Project,
     val projectFolder: File,
-    val outputFiles: List<File>
+    val missingBuildRunnerDependency: Boolean,
+)
+
+data class PubspecYaml(
+    @JvmField
+    val dependencies: Map<String, Any> = emptyMap(),
+    @JvmField
+    val devDependencies: Map<String, Any> = emptyMap(),
 )

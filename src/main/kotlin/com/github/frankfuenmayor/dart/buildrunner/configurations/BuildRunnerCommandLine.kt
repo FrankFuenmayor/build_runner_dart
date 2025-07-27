@@ -1,5 +1,6 @@
 package com.github.frankfuenmayor.dart.buildrunner.configurations
 
+import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerData
 import com.github.frankfuenmayor.dart.buildrunner.process.BuildRunnerProcessListener
 import com.github.frankfuenmayor.dart.buildrunner.ui.DartBuildRunnerOutputWindow.Companion.DART_BUILD_RUNNER_TOOL_WINDOW_ID
 import com.intellij.execution.configurations.GeneralCommandLine
@@ -13,7 +14,6 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.ui.content.ContentFactory
 import com.jetbrains.lang.dart.sdk.DartSdk
 import com.jetbrains.lang.dart.sdk.DartSdkUtil
-import java.io.File
 
 class BuildRunnerCommandLine(
     val resolveDartExePath: (Project) -> String = ::getDartExePath,
@@ -23,16 +23,12 @@ class BuildRunnerCommandLine(
 ) {
 
     fun runCommandLine(
-        filename: String,
-        dartProjectName: String,
-        project: Project,
-        workDirectory: File,
-        outputFiles: List<File> = emptyList(),
+        buildRunnerData: BuildRunnerData,
         deleteConflictingOutputs: Boolean = false,
         onBuildEnd: () -> Unit = {}
     ) {
 
-        val dartExePath = resolveDartExePath(project)
+        val dartExePath = resolveDartExePath(buildRunnerData.project)
 
         val arguments = mutableListOf(
             dartExePath,
@@ -41,7 +37,7 @@ class BuildRunnerCommandLine(
             "build"
         )
 
-        outputFiles.forEach {
+        buildRunnerData.outputFiles.forEach {
             arguments.add("--build-filter")
             arguments.add(it.absolutePath)
         }
@@ -52,24 +48,33 @@ class BuildRunnerCommandLine(
 
         val generalCommandLine = GeneralCommandLine(arguments).apply {
             charset = Charsets.UTF_8
-            setWorkDirectory(workDirectory)
+            setWorkDirectory(buildRunnerData.projectFolder)
         }
 
         val processHandler: BaseProcessHandler<Process> = createProcessHandler(generalCommandLine)
-        val consoleView = getBuildRunnerConsoleView(project, dartProjectName, filename)
+        val consoleView = getBuildRunnerConsoleView(
+            buildRunnerData.project,
+            buildRunnerData.dartProjectName,
+            buildRunnerData.filename
+        )
             ?: throw RuntimeException("Console view not found")
 
         consoleView.clear()
+
+
+        if (buildRunnerData.missingBuildRunnerDependency) {
+            consoleView.println("💥 ERROR: build_runner dev_dependency is missing 💥")
+            consoleView.println("run cancelled.")
+
+            return
+        }
 
         processHandler.addProcessListener(
             BuildRunnerProcessListener(
                 consoleView = consoleView,
                 runAgain = {
                     runCommandLine(
-                        filename = filename,
-                        dartProjectName = dartProjectName,
-                        project = project,
-                        workDirectory = workDirectory,
+                        buildRunnerData,
                         deleteConflictingOutputs = true,
                         onBuildEnd = onBuildEnd
                     )
@@ -79,16 +84,16 @@ class BuildRunnerCommandLine(
                     consoleView.println("")
 
                     var missingOutputFiles = 0
-                    for (file in outputFiles) {
+                    for (file in buildRunnerData.outputFiles) {
                         if (!file.exists()) {
                             missingOutputFiles++
-                            consoleView.printlnError("Output file ${file.name} not generated")
+                            consoleView.println("⚠️ Output file ${file.name} not generated")
                         }
                     }
 
                     if (missingOutputFiles > 0) {
-                        consoleView.printlnError(
-                            "Check your build_runner configuration"
+                        consoleView.println(
+                            "⚠️ Check your build_runner configuration"
                         )
                     }
                     onBuildEnd()
@@ -104,7 +109,11 @@ class BuildRunnerCommandLine(
             DartSdkUtil.getDartExePath(it)
         } ?: throw RuntimeException("Dart SDK not found")
 
-        private fun getBuildRunnerConsoleView(project: Project, dartProjectName: String, filename: String): ConsoleView? {
+        private fun getBuildRunnerConsoleView(
+            project: Project,
+            dartProjectName: String,
+            filename: String
+        ): ConsoleView? {
             val toolWindow = ToolWindowManager
                 .getInstance(project)
                 .getToolWindow(DART_BUILD_RUNNER_TOOL_WINDOW_ID) ?: return null
@@ -113,18 +122,24 @@ class BuildRunnerCommandLine(
 
             val contentManager = toolWindow.contentManager
             val displayName = "$filename [$dartProjectName]"
-            var content = contentManager.contents.firstOrNull { it.displayName == displayName }
+            var content = contentManager.contents.firstOrNull {
+                it.displayName == displayName
+            }
 
             if (content == null) {
+                val consoleView = ConsoleViewImpl(project, true)
+
                 content = ContentFactory.getInstance().createContent(
-                    ConsoleViewImpl(project, true).component,
+                    consoleView.component,
                     displayName,
                     false
                 )
+
                 contentManager.addContent(content)
             }
 
             contentManager.setSelectedContent(content)
+
             return content.component as ConsoleView
         }
     }
