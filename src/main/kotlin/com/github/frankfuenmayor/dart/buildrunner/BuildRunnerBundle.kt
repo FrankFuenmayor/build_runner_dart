@@ -1,13 +1,13 @@
-package com.github.frankfuenmayor.dart
+package com.github.frankfuenmayor.dart.buildrunner
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 @NonNls
-private const val BUNDLE = "messages.MyBundle"
+private const val BUNDLE = "com.github.frankfuenmayor.dart.buildrunner.BuildRunnerBundle"
 
-object MyBundle : DynamicBundle(BUNDLE) {
+object BuildRunnerBundle : DynamicBundle(BUNDLE) {
 
     @JvmStatic
     fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any) =

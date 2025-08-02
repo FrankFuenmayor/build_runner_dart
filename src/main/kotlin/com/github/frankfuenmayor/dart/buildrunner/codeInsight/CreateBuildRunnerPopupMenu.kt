@@ -3,8 +3,10 @@
 package com.github.frankfuenmayor.dart.buildrunner.codeInsight
 
 import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerData
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.psi.PsiDocumentManager
 import icons.DartIcons
 import java.io.File
 import javax.swing.JLabel
@@ -30,6 +32,9 @@ class CreateBuildRunnerPopupMenu() {
 
         items.add("Generate all file(s) in '${buildRunnerData.dartProjectName}' (--delete-conflicting-outputs)")
 
+        PsiDocumentManager.getInstance(buildRunnerData.project).commitAllDocuments()
+        FileDocumentManager.getInstance().saveAllDocuments();
+
         return JBPopupFactory
             .getInstance()
             .createPopupChooserBuilder(items)
@@ -47,7 +52,9 @@ class CreateBuildRunnerPopupMenu() {
                     value,
                     DartIcons.Dart_file,
                     JLabel.LEFT
-                )
+                ).apply {
+                    border = javax.swing.BorderFactory.createEmptyBorder(4, 8, 4, 8)
+                }
             })
             .setTitle("Build Runner")
             .createPopup()

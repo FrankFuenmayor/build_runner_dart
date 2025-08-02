@@ -15,7 +15,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>Dart</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
+    <resource-bundle>buildrunner.BuildRunnerBundle</resource-bundle>
 
 
 
@@ -39,7 +39,16 @@
 
         <notificationGroup id="Dart build_runner notification group"
                            displayType="BALLOON"
-                           bundle="messages.MyBundle"
+                           bundle="buildrunner.BuildRunnerBundle"
                            key="notification.group.dart.build_runner.notification.group"/>
+
+
+        <localInspection 
+            language="Dart"
+            shortName="MissingPartStatement"
+            displayName="Missing required part statement"
+            groupName="Build Runner - Dart"
+            enabledByDefault="true"
+            implementationClass="com.github.frankfuenmayor.dart.buildrunner.codeInspection.MissingRequiredPartStatementLocalInspection"/>
     </extensions>
 </idea-plugin>

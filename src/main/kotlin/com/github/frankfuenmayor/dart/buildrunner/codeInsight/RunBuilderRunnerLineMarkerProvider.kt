@@ -3,7 +3,7 @@ package com.github.frankfuenmayor.dart.buildrunner.codeInsight
 import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerAnnotations
 import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerData
 import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerDataBuilder
-import com.github.frankfuenmayor.dart.buildrunner.settings.BuildRunnerAnnotationsService
+import com.github.frankfuenmayor.dart.buildrunner.components.BuildRunnerAnnotationsService
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider

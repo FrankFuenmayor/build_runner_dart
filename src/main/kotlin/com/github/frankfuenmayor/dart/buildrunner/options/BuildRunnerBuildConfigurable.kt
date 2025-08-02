@@ -2,7 +2,7 @@ package com.github.frankfuenmayor.dart.buildrunner.options
 
 import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerAnnotation
 import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerAnnotation.Companion.builtIns
-import com.github.frankfuenmayor.dart.buildrunner.settings.BuildRunnerAnnotationsService
+import com.github.frankfuenmayor.dart.buildrunner.components.BuildRunnerAnnotationsService
 import com.intellij.openapi.options.Configurable
 import com.intellij.ui.AnActionButton
 import com.intellij.ui.ToolbarDecorator
@@ -22,7 +22,8 @@ class BuildRunnerBuildConfigurable(
 
     val model: ListTableModel<BuildRunnerAnnotation> = ListTableModel<BuildRunnerAnnotation>(
         AnnotationColumn,
-        FilePatternsColumn
+        FilePatternsColumn,
+        PartStatementRequiredColumn
     )
 
     @Nls
@@ -113,5 +114,22 @@ object FilePatternsColumn : ColumnInfo<BuildRunnerAnnotation, String>("Output Fi
 
     override fun getColumnClass(): Class<*> {
         return String::class.java
+    }
+}
+
+object PartStatementRequiredColumn: ColumnInfo<BuildRunnerAnnotation, Boolean>("Part Statement Required") {
+    override fun valueOf(item: BuildRunnerAnnotation): Boolean {
+        return item.partStatementRequired
+    }
+    override fun isCellEditable(item: BuildRunnerAnnotation): Boolean {
+        return builtIns.none { it == item }
+    }
+
+    override fun setValue(item: BuildRunnerAnnotation, value: Boolean) {
+        item.partStatementRequired = value
+    }
+
+    override fun getColumnClass(): Class<*> {
+        return Boolean::class.java
     }
 }

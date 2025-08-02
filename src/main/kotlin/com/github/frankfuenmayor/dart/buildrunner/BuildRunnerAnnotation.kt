@@ -1,6 +1,10 @@
 package com.github.frankfuenmayor.dart.buildrunner
 
-class BuildRunnerAnnotation(identifier: String = "", var filePatterns: List<String> = emptyList()) {
+class BuildRunnerAnnotation(
+    identifier: String = "",
+    var filePatterns: List<String> = emptyList(),
+    var partStatementRequired: Boolean = true
+) {
 
     var identifier = identifier.removePrefix("@")
         set(value) {
@@ -13,6 +17,7 @@ class BuildRunnerAnnotation(identifier: String = "", var filePatterns: List<Stri
     val isBuiltIn: Boolean
         get() = builtIns.any { it == this }
 
+    fun getFileNames(baseFileName: String): List<String> = filePatterns.map { it.replace("*", baseFileName) }
 
 
     companion object {
@@ -25,6 +30,8 @@ class BuildRunnerAnnotation(identifier: String = "", var filePatterns: List<Stri
             mockitoGenerateNiceMocks
         )
     }
+
+
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -42,6 +49,10 @@ class BuildRunnerAnnotation(identifier: String = "", var filePatterns: List<Stri
         var result = filePatterns.hashCode()
         result = 31 * result + identifier.hashCode()
         return result
+    }
+
+    override fun toString(): String {
+        return "BuildRunnerAnnotation(filePatterns=$filePatterns, partStatementRequired=$partStatementRequired, identifier='$identifier', isValid=$isValid, isBuiltIn=$isBuiltIn)"
     }
 }
 
@@ -62,10 +73,12 @@ private val jsonBuildRunnerAnnotation = BuildRunnerAnnotation(
 
 private val mockitoGenerateMocks = BuildRunnerAnnotation(
     identifier = "GenerateMocks",
-    filePatterns = listOf("*.mocks.dart")
+    filePatterns = listOf("*.mocks.dart"),
+    partStatementRequired = false
 )
 
 private val mockitoGenerateNiceMocks = BuildRunnerAnnotation(
     identifier = "GenerateNiceMocks",
-    filePatterns = listOf("*.mocks.dart")
+    filePatterns = listOf("*.mocks.dart"),
+    partStatementRequired = false
 )

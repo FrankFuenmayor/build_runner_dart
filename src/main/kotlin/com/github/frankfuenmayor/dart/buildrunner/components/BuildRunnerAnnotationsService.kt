@@ -1,4 +1,4 @@
-package com.github.frankfuenmayor.dart.buildrunner.settings
+package com.github.frankfuenmayor.dart.buildrunner.components
 
 import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerAnnotation
 import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerAnnotation.Companion.builtIns
@@ -10,8 +10,8 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 
 @State(
-    name = "FlutterHelperPluginSettings",
-    storages = [Storage("FlutterHelperPluginSettings.xml")]
+    name = "BuildRunnerForDartState",
+    storages = [Storage("BuildRunnerForDartState.xml")]
 )
 @Service(Service.Level.APP)
 class BuildRunnerAnnotationsService :

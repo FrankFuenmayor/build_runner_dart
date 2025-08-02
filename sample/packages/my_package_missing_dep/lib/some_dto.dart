@@ -1,7 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'person.freezed.dart';
-
 @freezed
 class SomeDto with _$SomeDto {
   final String field1;

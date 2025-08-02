@@ -1,6 +1,7 @@
 package com.github.frankfuenmayor.dart.buildrunner.configurations
 
 import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerData
+import com.github.frankfuenmayor.dart.buildrunner.ignoreBuildRunnerAnnotationsMissingParts
 import com.github.frankfuenmayor.dart.buildrunner.process.BuildRunnerProcessListener
 import com.github.frankfuenmayor.dart.buildrunner.ui.DartBuildRunnerOutputWindow.Companion.DART_BUILD_RUNNER_TOOL_WINDOW_ID
 import com.intellij.execution.configurations.GeneralCommandLine
@@ -14,6 +15,7 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.ui.content.ContentFactory
 import com.jetbrains.lang.dart.sdk.DartSdk
 import com.jetbrains.lang.dart.sdk.DartSdkUtil
+import java.io.File
 
 class BuildRunnerCommandLine(
     val resolveDartExePath: (Project) -> String = ::getDartExePath,
@@ -25,6 +27,7 @@ class BuildRunnerCommandLine(
     fun runCommandLine(
         buildRunnerData: BuildRunnerData,
         deleteConflictingOutputs: Boolean = false,
+        outputFiles: List<File> = emptyList(),
         onBuildEnd: () -> Unit = {}
     ) {
 
@@ -37,13 +40,13 @@ class BuildRunnerCommandLine(
             "build"
         )
 
-        buildRunnerData.outputFiles.forEach {
-            arguments.add("--build-filter")
-            arguments.add(it.absolutePath)
-        }
-
         if (deleteConflictingOutputs) {
             arguments.add("--delete-conflicting-outputs")
+        } else {
+            outputFiles.forEach { outputFile ->
+                arguments.add("--build-filter")
+                arguments.add(outputFile.relativeTo(buildRunnerData.projectFolder).path)
+            }
         }
 
         val generalCommandLine = GeneralCommandLine(arguments).apply {
@@ -61,7 +64,6 @@ class BuildRunnerCommandLine(
 
         consoleView.clear()
 
-
         if (buildRunnerData.missingBuildRunnerDependency) {
             consoleView.println("💥 ERROR: build_runner dev_dependency is missing 💥")
             consoleView.println("run cancelled.")
@@ -72,32 +74,40 @@ class BuildRunnerCommandLine(
         processHandler.addProcessListener(
             BuildRunnerProcessListener(
                 consoleView = consoleView,
-                runAgain = {
-                    runCommandLine(
-                        buildRunnerData,
-                        deleteConflictingOutputs = true,
-                        onBuildEnd = onBuildEnd
-                    )
-                },
-                onBuildEnd = {
-
-                    consoleView.println("")
-
-                    var missingOutputFiles = 0
-                    for (file in buildRunnerData.outputFiles) {
-                        if (!file.exists()) {
-                            missingOutputFiles++
-                            consoleView.println("⚠️ Output file ${file.name} not generated")
-                        }
-                    }
-
-                    if (missingOutputFiles > 0) {
-                        consoleView.println(
-                            "⚠️ Check your build_runner configuration"
+                runAgain =
+                    {
+                        runCommandLine(
+                            buildRunnerData,
+                            deleteConflictingOutputs = true,
+                            onBuildEnd = onBuildEnd
                         )
+                    },
+                onBuildEnd =
+                    {
+
+                        consoleView.println("")
+
+                        var missingOutputFiles = 0
+
+                        val outputFiles = buildRunnerData.outputFiles.filterNot {
+                            buildRunnerData.file.ignoreBuildRunnerAnnotationsMissingParts().contains(it.name)
+                        }
+
+                        for (file in outputFiles) {
+                            if (!file.exists()) {
+                                missingOutputFiles++
+                                consoleView.println("⚠️ Output file ${file.name} not generated")
+                            }
+                        }
+
+                        if (missingOutputFiles > 0) {
+                            consoleView.println(
+                                "⚠️ Check your build_runner configuration"
+                            )
+                        }
+
+                        onBuildEnd()
                     }
-                    onBuildEnd()
-                }
             )
         )
 
@@ -143,11 +153,6 @@ class BuildRunnerCommandLine(
             return content.component as ConsoleView
         }
     }
-}
-
-
-private fun ConsoleView.printlnError(string: String) {
-    print(string + "\n", ConsoleViewContentType.ERROR_OUTPUT)
 }
 
 private fun ConsoleView.println(string: String) {

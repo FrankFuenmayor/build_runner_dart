@@ -1,3 +1,4 @@
+// ignore_missing_part: person.g.dart
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'person.freezed.dart';
