@@ -7,13 +7,11 @@ import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.project.Project
 import com.jetbrains.lang.dart.util.DartElementGenerator
 
-class AddPartStatementLocalQuickFix(
-    private val missingPart: String
-) : LocalQuickFix {
+class AddPartStatementLocalQuickFix(private val missingPart: String) : LocalQuickFix {
 
     override fun getName(): String = "Add part '$missingPart'"
 
-    override fun getFamilyName(): String = "Add part statements"
+    override fun getFamilyName(): String = "Add part statement"
 
     override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
         val file = descriptor.psiElement.containingFile
@@ -26,5 +24,23 @@ class AddPartStatementLocalQuickFix(
             .createDummyFile(project, "part '$missingPart';").firstChild!!
 
         file.addAfter(partElement, insertReference)
+    }
+}
+
+class IgnoreMissingPartStatementLocalQuickFix(private val missingPart: String) : LocalQuickFix {
+
+    override fun getName(): String = "Ignore missing part '$missingPart'"
+
+    override fun getFamilyName(): String = "Ignore part statement"
+
+    override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
+        val file = descriptor.psiElement.containingFile
+
+        val partElement = DartElementGenerator
+            .createDummyFile(project, "// ignore_missing_part: $missingPart;")
+
+
+
+        file.addBefore(partElement, file.firstChild)
     }
 }

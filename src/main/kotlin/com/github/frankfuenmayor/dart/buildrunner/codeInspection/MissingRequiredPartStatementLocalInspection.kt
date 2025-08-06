@@ -2,9 +2,9 @@ package com.github.frankfuenmayor.dart.buildrunner.codeInspection
 
 import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerAnnotation
 import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerAnnotations
+import com.github.frankfuenmayor.dart.buildrunner.components.BuildRunnerAnnotationsService
 import com.github.frankfuenmayor.dart.buildrunner.psi.getMetadataInFile
 import com.github.frankfuenmayor.dart.buildrunner.psi.getPartStatementsInFile
-import com.github.frankfuenmayor.dart.buildrunner.components.BuildRunnerAnnotationsService
 import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemDescriptor
@@ -41,7 +41,7 @@ class MissingRequiredPartStatementLocalInspection(
             .takeIf { it.isNotEmpty() }
             ?: return null
 
-        return missingPartFiles
+        val descriptors = missingPartFiles
             .map { missingPart ->
                 manager.createProblemDescriptor(
                     metadata.findMetadata(annotations),
@@ -50,7 +50,18 @@ class MissingRequiredPartStatementLocalInspection(
                     ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                     isOnTheFly
                 )
-            }.toTypedArray()
+            } + missingPartFiles.map {
+                missingPart ->
+                manager.createProblemDescriptor(
+                    metadata.findMetadata(annotations),
+                    "Ignore missing '$missingPart' part",
+                    IgnoreMissingPartStatementLocalQuickFix(missingPart),
+                    ProblemHighlightType.INFORMATION,
+                    isOnTheFly
+                )
+            }
+
+        return descriptors.toTypedArray()
     }
 }
 

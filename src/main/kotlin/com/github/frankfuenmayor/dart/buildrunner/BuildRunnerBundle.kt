@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 @NonNls
-private const val BUNDLE = "com.github.frankfuenmayor.dart.buildrunner.BuildRunnerBundle"
+private const val BUNDLE = "buildrunner.BuildRunnerBundle"
 
 object BuildRunnerBundle : DynamicBundle(BUNDLE) {
 
