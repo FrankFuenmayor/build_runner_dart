@@ -4,10 +4,7 @@ import com.github.frankfuenmayor.dart.buildrunner.psi.importStatements
 import com.github.frankfuenmayor.dart.buildrunner.psi.partStatements
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
-import com.intellij.openapi.application.WriteIntentReadAction
-import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiDocumentManager
 import com.jetbrains.lang.dart.util.DartElementGenerator
 
 class AddPartStatementLocalQuickFix(

@@ -1,7 +1,6 @@
 package com.github.frankfuenmayor.dart.buildrunner.configurations
 
 import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerData
-import com.github.frankfuenmayor.dart.buildrunner.ignoreBuildRunnerAnnotationsMissingParts
 import com.github.frankfuenmayor.dart.buildrunner.process.BuildRunnerProcessListener
 import com.github.frankfuenmayor.dart.buildrunner.ui.DartBuildRunnerOutputWindow.Companion.DART_BUILD_RUNNER_TOOL_WINDOW_ID
 import com.intellij.execution.configurations.GeneralCommandLine
@@ -85,15 +84,11 @@ class BuildRunnerCommandLine(
                 onBuildEnd =
                     {
 
-                        consoleView.println("")
+                        consoleView.emptyLine()
 
                         var missingOutputFiles = 0
 
-                        val outputFiles = buildRunnerData.outputFiles.filterNot {
-                            buildRunnerData.file.ignoreBuildRunnerAnnotationsMissingParts().contains(it.name)
-                        }
-
-                        for (file in outputFiles) {
+                        for (file in buildRunnerData.outputFiles) {
                             if (!file.exists()) {
                                 missingOutputFiles++
                                 consoleView.println("⚠️ Output file ${file.name} not generated")
@@ -157,5 +152,9 @@ class BuildRunnerCommandLine(
 
 private fun ConsoleView.println(string: String) {
     print(string + "\n", ConsoleViewContentType.NORMAL_OUTPUT)
+}
+
+private fun ConsoleView.emptyLine() {
+    println("")
 }
 

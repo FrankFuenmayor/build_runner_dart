@@ -34,24 +34,10 @@ class BuildRunnerDataBuilder(
         val containingFile = psiElement!!.containingFile
         val pubspecYamlFile = findPubspecYamlFile(psiElement!!.project, containingFile.virtualFile)
         val projectName = pubspecYamlFile?.let { getDartProjectName(it) }
-        val fileFolder = containingFile.virtualFile.parent.path
-        val fileName = containingFile.name.removeSuffix(".dart")
-        val ignoredParts = containingFile.ignoreBuildRunnerAnnotationsMissingParts()
-
-        val outputFiles = buildRunnerAnnotation!!.filePatterns.mapNotNull {
-            val outputFilename = it.replace("*", fileName)
-            if (ignoredParts.contains(outputFilename)) null
-            else Paths.get(fileFolder, outputFilename).toFile()
-        }
-
         val projectFolder = pubspecYamlFile?.let { File(it.parent.path) }
+        val outputFiles = getOutputFiles()
 
-        val pubspecYaml = Yaml().loadAs(pubspecYamlFile?.inputStream, Map::class.java)
-
-        @Suppress("UNCHECKED_CAST")
-        val devDependencies = pubspecYaml["dev_dependencies"] as? Map<String, String>
-
-        val missingBuildRunnerDependency = devDependencies?.containsKey("build_runner") == false
+        val missingBuildRunnerDependency = isMissingBuildRunnerDependency(pubspecYamlFile)
 
         return BuildRunnerData(
             filename = psiElement!!.containingFile.virtualFile.name,
@@ -61,8 +47,29 @@ class BuildRunnerDataBuilder(
             annotation = buildRunnerAnnotation!!,
             project = psiElement!!.project,
             missingBuildRunnerDependency = missingBuildRunnerDependency,
-            file = psiElement!!.containingFile,
         )
+    }
+
+    private fun getOutputFiles(): List<File> {
+        val containingFile = psiElement!!.containingFile
+        val fileFolder = containingFile.virtualFile.parent.path
+        val baseFilename = containingFile.name.removeSuffix(".dart")
+        val ignoredParts = containingFile.ignoreBuildRunnerAnnotationsMissingParts()
+
+        return buildRunnerAnnotation!!.filePatterns
+            .map { it.replace("*", baseFilename) }
+            .filterNot { ignoredParts.contains(it) }
+            .map { Paths.get(fileFolder, it).toFile() }
+    }
+
+    private fun isMissingBuildRunnerDependency(pubspecYamlFile: VirtualFile?): Boolean {
+        val pubspecYaml = Yaml().loadAs(pubspecYamlFile?.inputStream, Map::class.java)
+
+        @Suppress("UNCHECKED_CAST")
+        val devDependencies = pubspecYaml["dev_dependencies"] as? Map<String, String>
+
+        val missingBuildRunnerDependency = devDependencies?.containsKey("build_runner") == false
+        return missingBuildRunnerDependency
     }
 }
 
@@ -74,11 +81,9 @@ data class BuildRunnerData(
     val project: Project,
     val projectFolder: File,
     val missingBuildRunnerDependency: Boolean,
-    val file: PsiFile,
 )
 
-
-fun PsiFile.ignoreBuildRunnerAnnotationsMissingParts(): List<String> = text
+private fun PsiFile.ignoreBuildRunnerAnnotationsMissingParts(): List<String> = text
     .split("\n")
     .map { it.trim() }
     .filter { it.startsWith("// ignore_missing_part:") }
