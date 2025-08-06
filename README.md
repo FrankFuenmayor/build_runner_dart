@@ -1,7 +1,7 @@
 # build_runner for Dart
 
 ![Build](https://github.com/FrankFuenmayor/build_runner_dart/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/28103)
+[![Version](https://img.shields.io/jetbrains/plugin/v/28103.svg)](https://plugins.jetbrains.com/plugin/28103)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/28103.svg)](https://plugins.jetbrains.com/plugin/28103)
 
 <!-- Plugin description -->
