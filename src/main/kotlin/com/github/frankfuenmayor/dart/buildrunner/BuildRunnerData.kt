@@ -2,6 +2,7 @@ package com.github.frankfuenmayor.dart.buildrunner
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.jetbrains.lang.dart.util.PubspecYamlUtil
@@ -29,10 +30,10 @@ class BuildRunnerDataBuilder(
     fun build(): BuildRunnerData {
 
         if (psiElement == null) throw RuntimeException("PsiElement not set")
-        if (buildRunnerAnnotation == null) throw RuntimeException("BuildRunnerAnnotation not set")
 
-        val containingFile = psiElement!!.containingFile
-        val pubspecYamlFile = findPubspecYamlFile(psiElement!!.project, containingFile.virtualFile)
+
+        val virtualFile = (psiElement as? PsiDirectory)?.virtualFile ?: psiElement!!.containingFile.virtualFile
+        val pubspecYamlFile = findPubspecYamlFile(psiElement!!.project, virtualFile)
         val projectName = pubspecYamlFile?.let { getDartProjectName(it) }
         val projectFolder = pubspecYamlFile?.let { File(it.parent.path) }
         val outputFiles = getOutputFiles()
@@ -40,17 +41,21 @@ class BuildRunnerDataBuilder(
         val missingBuildRunnerDependency = isMissingBuildRunnerDependency(pubspecYamlFile)
 
         return BuildRunnerData(
-            filename = psiElement!!.containingFile.virtualFile.name,
+            filename = virtualFile.name,
             dartProjectName = projectName ?: throw RuntimeException("Project name not found"),
             projectFolder = projectFolder ?: throw RuntimeException("Project folder not found"),
             outputFiles = outputFiles,
-            annotation = buildRunnerAnnotation!!,
             project = psiElement!!.project,
             missingBuildRunnerDependency = missingBuildRunnerDependency,
         )
     }
 
     private fun getOutputFiles(): List<File> {
+
+        if( buildRunnerAnnotation == null) {
+            return emptyList()
+        }
+
         val containingFile = psiElement!!.containingFile
         val fileFolder = containingFile.virtualFile.parent.path
         val baseFilename = containingFile.name.removeSuffix(".dart")
@@ -73,8 +78,7 @@ class BuildRunnerDataBuilder(
     }
 }
 
-data class BuildRunnerData(
-    val annotation: BuildRunnerAnnotation,
+ data class BuildRunnerData(
     val dartProjectName: String,
     val filename: String,
     val outputFiles: List<File>,

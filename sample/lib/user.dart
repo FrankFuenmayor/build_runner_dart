@@ -1,4 +1,4 @@
-// ignore_missing_part: user.g.dart
+// ignore_missing_part: user.g.dart;
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'user.freezed.dart';
