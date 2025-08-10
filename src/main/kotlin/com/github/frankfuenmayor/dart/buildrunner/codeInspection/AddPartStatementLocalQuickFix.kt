@@ -37,9 +37,7 @@ class IgnoreMissingPartStatementLocalQuickFix(private val missingPart: String) :
         val file = descriptor.psiElement.containingFile
 
         val partElement = DartElementGenerator
-            .createDummyFile(project, "// ignore_missing_part: $missingPart;")
-
-
+            .createDummyFile(project, "// ignore_missing_part: $missingPart")
 
         file.addBefore(partElement, file.firstChild)
     }
