@@ -7,7 +7,7 @@ changelog = "2.2.1"
 intelliJPlatform = "2.5.0"
 kotlin = "2.1.21-RC2"
 kover = "0.8.3"
-qodana = "2024.2.3"
+qodana = "2025.1.1"
 mockk = "1.13.14"
 
 [libraries]
