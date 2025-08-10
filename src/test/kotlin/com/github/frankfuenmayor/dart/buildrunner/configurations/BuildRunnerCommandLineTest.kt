@@ -1,6 +1,5 @@
 package com.github.frankfuenmayor.dart.buildrunner.configurations
 
-import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerAnnotation
 import com.github.frankfuenmayor.dart.buildrunner.BuildRunnerData
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.BaseProcessHandler
@@ -30,21 +29,24 @@ class BuildRunnerCommandLineTest : BasePlatformTestCase() {
         )
 
         val file1 = mockk<File> {
-            every { absolutePath } returns "file1"
+            every { absolutePath } returns "/somedir/file1"
+            every { path } returns "/somedir/file1"
         }
         val file2 = mockk<File> {
-            every { absolutePath } returns "file2"
+            every { absolutePath } returns "/somedir/file2"
+            every { path } returns "/somedir/file2"
         }
 
         buildRunner.runCommandLine(
             buildRunnerData = BuildRunnerData(
-                annotation = BuildRunnerAnnotation("freezed"),
                 dartProjectName = "my_project",
                 filename = "my_file",
                 outputFiles = listOf(file1, file2),
                 project = project,
                 projectFolder = File("/somedir"),
+                missingBuildRunnerDependency = false
             ),
+            outputFiles = listOf(file1, file2),
             deleteConflictingOutputs = false
         )
 
@@ -73,12 +75,12 @@ class BuildRunnerCommandLineTest : BasePlatformTestCase() {
 
         buildRunner.runCommandLine(
             buildRunnerData = BuildRunnerData(
-                annotation = BuildRunnerAnnotation("freezed"),
                 dartProjectName = "my_project",
                 filename = "my_file",
                 outputFiles = emptyList(),
                 project = project,
                 projectFolder = File("/somedir"),
+                missingBuildRunnerDependency = false
             ),
             deleteConflictingOutputs = true
         )
